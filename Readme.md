@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Жанна Нарсия](https://up.htmlacademy.ru/ecmascript/8/user/74538).
-* Наставник: `Неизвестно`.
+* Наставник: [Алексей Хапов](https://github.com/kvakazyambra).
 
 ---
 
