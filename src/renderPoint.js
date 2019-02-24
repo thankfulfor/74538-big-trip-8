@@ -17,8 +17,8 @@ export default function (icon, title, timetable, duration, price, offers) {
     <span class="trip-point__duration">${duration}</span>
     </p>
     <p class="trip-point__price">${price}</p>
-    <ul class="trip-point__offers">` +
-    renderListItem(offers)
-    + `</ul></article>`
+    <ul class="trip-point__offers">
+    ${renderListItem(offers)}
+    </ul></article>`
   );
 }
