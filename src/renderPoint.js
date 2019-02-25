@@ -1,8 +1,9 @@
 const renderListItem = function (offers) {
   let offersList = ``;
-  for (let i = 0; i < offers.length; i++) {
-    offersList += `<li><button class="trip-point__offer">${offers[i]}</button></li>`;
-  }
+  offers.forEach(function (offer) {
+    offersList += `<li><button class="trip-point__offer">${offer}</button></li>`;
+    return offersList;
+  });
   return offersList;
 };
 

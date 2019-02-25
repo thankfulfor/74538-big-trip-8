@@ -61,16 +61,17 @@ const filterInputChangeHandler = function () {
 
 const showPointsByClick = function () {
   const filterInputElements = filtersParentElement.querySelectorAll(`[name=filter]`);
-  for (let i = 0; i < filterInputElements.length; i++) {
-    filterInputElements[i].addEventListener(`change`, filterInputChangeHandler);
-  }
+  filterInputElements.forEach(function (filterInputElement) {
+    filterInputElement.addEventListener(`change`, filterInputChangeHandler);
+  });
 };
 
 const showFilters = function (parentElement, filterType, filtersArray) {
   let filterList = ``;
-  for (let i = 0; i < filtersArray.length; i++) {
-    filterList += renderFilter(filterType, filtersArray[i].name, filtersArray[i].checked);
-  }
+  filtersArray.forEach(function (filtersItem) {
+    filterList += renderFilter(filterType, filtersItem.name, filtersItem.checked);
+    return filterList;
+  });
   // Используется insertAdjacentHTML вместо innerHTML потому,
   // что в верстке родителя .trip-sorting последним стоит span
   parentElement.insertAdjacentHTML(`afterbegin`, filterList);
