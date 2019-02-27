@@ -67,15 +67,12 @@ const showPointsByClick = function () {
 };
 
 const showFilters = function (parentElement, filterType, filtersArray) {
-  let filterList = ``;
-  filtersArray.forEach(function (filtersItem) {
-    filterList += renderFilter(filterType, filtersItem.name, filtersItem.checked);
-    return filterList;
+  const filterList = filtersArray.map((filtersItem) => {
+    return renderFilter(filterType, filtersItem.name, filtersItem.checked);
   });
-  // Используется insertAdjacentHTML вместо innerHTML потому,
-  // что в верстке родителя .trip-sorting последним стоит span
-  parentElement.insertAdjacentHTML(`afterbegin`, filterList);
+  parentElement.insertAdjacentHTML(`afterbegin`, filterList.join(``));
 };
+
 
 const showPoints = function (cardsQuantity) {
   let filterList = ``;

@@ -1,10 +1,9 @@
 const renderListItem = function (offers) {
-  let offersList = ``;
-  offers.forEach(function (offer) {
-    offersList += `<li><button class="trip-point__offer">${offer}</button></li>`;
-    return offersList;
+  const offersList = offers.map((offer) => {
+    return `<li><button class="trip-point__offer">${offer}</button></li>`;
   });
-  return offersList;
+
+  return offersList.join(``);
 };
 
 
