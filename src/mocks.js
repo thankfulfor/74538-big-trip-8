@@ -1,6 +1,7 @@
 import {getRandomNumber} from './utils';
 
 const MILLISECONDS_IN_TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+const MILLISECONDS_IN_HOUR = 60 * 60 * 1000;
 const DAYS_IN_WEEK = 7;
 const DESCRIPTION_MAX_QUANTITY = 3;
 const OFFER_MAX_QUANTITY = 3;
@@ -115,6 +116,14 @@ sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismo
 Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.
 In rutrum ac purus sit amet tempus.`.split(`. `);
 
+const getFormatedTime = (miliseconds) => {
+  return new Date(miliseconds).toLocaleString(`en-US`, {
+    hour: `numeric`,
+    minute: `numeric`,
+    hour12: false
+  });
+};
+
 export const getPointData = () => ({
   randomEvent: events[getRandomNumber(events.length)],
   get icon() {
@@ -132,16 +141,17 @@ export const getPointData = () => ({
     }
     return statements.trim();
   },
-  pointDate: new Date(Date.now() + getRandomNumber(DAYS_IN_WEEK) * MILLISECONDS_IN_TWENTY_FOUR_HOURS),
-  get pointTime() {
-    const randomTime = new Date(Date.now() + getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
-    return randomTime.toLocaleString(`en-US`, {
-      hour: `numeric`,
-      minute: `numeric`,
-      hour12: false
-    });
+  date: new Date(Date.now() + getRandomNumber(DAYS_IN_WEEK) * MILLISECONDS_IN_TWENTY_FOUR_HOURS),
+  get time() {
+    const randomTimeFrom = Date.now() + Math.round(getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
+    const randomTimeTo = randomTimeFrom + Math.round(getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
+    const duration = Math.round((randomTimeTo - randomTimeFrom) / MILLISECONDS_IN_HOUR);
+    const randomTimeFromFormatted = getFormatedTime(randomTimeFrom);
+    const randomTimeToFormatted = getFormatedTime(randomTimeTo);
+    const durationFormatted = getFormatedTime(duration);
+    return {randomTimeFromFormatted, randomTimeToFormatted, durationFormatted};
   },
-  get pointPrice() {
+  get price() {
     return getRandomNumber(PRICE_MAX_QUANTITY);
   },
   get offers() {

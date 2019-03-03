@@ -18,10 +18,10 @@ export default function (data) {
       <i class="trip-icon">${data.icon}</i>
       <h3 class="trip-point__title">${data.title + data.city}</h3>
       <p class="trip-point__schedule">
-        <span class="trip-point__timetable">${data.pointTime}</span>
-        <span class="trip-point__duration">${data.duration}</span>
+        <span class="trip-point__timetable">${data.time.randomTimeFromFormatted} &mdash; ${data.time.randomTimeToFormatted}</span>
+        <span class="trip-point__duration">${data.time.durationFormatted}</span>
       </p>
-      <p class="trip-point__price">&euro;&nbsp;${data.pointPrice}</p>
+      <p class="trip-point__price">&euro;&nbsp;${data.price}</p>
       <ul class="trip-point__offers">
         ${renderListItem(data.offers)}
       </ul>
