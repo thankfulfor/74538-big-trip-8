@@ -1,8 +1,9 @@
-import renderFilter from '../src/renderFilter.js';
-import renderPoint from '../src/renderPoint.js';
+import {getRandomNumber} from './utils';
+import renderFilter from './renderFilter.js';
+import {getPointData} from './mocks';
+import renderPoint from './renderPoint.js';
 
 const TEMPLATE_POINTS_QUANTITY = 7;
-const MAX_POINTS_QUANTITY = 20;
 
 const filters = [
   {
@@ -34,22 +35,6 @@ const sorters = [
   }
 ];
 
-const points = {
-  icon: `✈️`,
-  title: `Flight to Geneva`,
-  timetable: `10:00&nbsp;&mdash; 11:00`,
-  duration: `1h 30m`,
-  price: `&euro;&nbsp;20`,
-  offers: [
-    `Upgrade to business +&euro;&nbsp;20`,
-    `Select meal +&euro;&nbsp;20`
-  ]
-};
-
-const getRandomNumber = function () {
-  return Math.floor(Math.random() * Math.floor(MAX_POINTS_QUANTITY));
-};
-
 const filtersParentElement = document.querySelector(`.trip-filter`);
 const sortersParentElement = document.querySelector(`.trip-sorting`);
 const pointParentElement = document.querySelector(`.trip-day__items`);
@@ -77,7 +62,7 @@ const showFilters = function (parentElement, filterType, filtersArray) {
 const showPoints = function (cardsQuantity) {
   let filterList = ``;
   for (let i = 0; i < cardsQuantity; i++) {
-    filterList += renderPoint(points.icon, points.title, points.timetable, points.duration, points.price, points.offers);
+    filterList += renderPoint(getPointData());
   }
   pointParentElement.innerHTML = filterList;
 };
