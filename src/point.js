@@ -16,15 +16,16 @@ export class Point {
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
-  get template() {
-    const renderListItem = function (offers) {
-      const randomPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
-      const offersList = Array.from(offers).map((offer) => {
-        return `<li><button class="trip-point__offer">${offer} +&euro;&nbsp;${randomPrice}</button></li>`;
-      });
+  _renderListItem(offers) {
+    const randomPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
+    const offersList = Array.from(offers).map((offer) => {
+      return `<li><button class="trip-point__offer">${offer} +&euro;&nbsp;${randomPrice}</button></li>`;
+    });
 
-      return offersList.join(``);
-    };
+    return offersList.join(``);
+  }
+
+  get template() {
     return (
       `<article class="trip-point">
         <i class="trip-icon">${this._icon}</i>
@@ -35,7 +36,7 @@ export class Point {
         </p>
         <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
         <ul class="trip-point__offers">
-          ${renderListItem(this._offers)}
+          ${this._renderListItem(this._offers)}
         </ul>
       </article>`
     );
