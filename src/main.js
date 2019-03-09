@@ -64,6 +64,12 @@ const renderPoint = function (data) {
   pointParentElement.appendChild(taskComponent.render());
   const editPointComponent = new EditPoint(data);
 
+  const replaceComponents = function () {
+    taskComponent.render();
+    pointParentElement.replaceChild(taskComponent.element, editPointComponent.element);
+    editPointComponent.unrender();
+  };
+
   taskComponent.onEdit = () => {
     editPointComponent.render();
     pointParentElement.replaceChild(editPointComponent.element, taskComponent.element);
@@ -71,15 +77,11 @@ const renderPoint = function (data) {
   };
 
   editPointComponent.onSubmit = () => {
-    taskComponent.render();
-    pointParentElement.replaceChild(taskComponent.element, editPointComponent.element);
-    editPointComponent.unrender();
+    replaceComponents();
   };
 
   editPointComponent.onReset = () => {
-    taskComponent.render();
-    pointParentElement.replaceChild(taskComponent.element, editPointComponent.element);
-    editPointComponent.unrender();
+    replaceComponents();
   };
 };
 
