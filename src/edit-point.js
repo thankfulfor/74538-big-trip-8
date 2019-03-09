@@ -1,10 +1,11 @@
-import {getRandomNumber, createElement} from './utils';
+import {getRandomNumber} from './utils';
+import {Component} from './component';
 
 const OFFER_PRICE_MAX_QUANTITY = 500;
 
-
-export class EditPoint {
+export class EditPoint extends Component {
   constructor(data) {
+    super();
     this._icon = data.icon;
     this._title = data.title;
     this._city = data.city;
@@ -14,7 +15,6 @@ export class EditPoint {
     this._time = data.time;
     this._price = data.price;
     this._offers = data.offers;
-    this._element = null;
 
     this._onSubmit = null;
     this._onReset = null;
@@ -179,16 +179,5 @@ export class EditPoint {
 
     this._element.querySelector(`.point__button--delete`)
       .removeEventListener(`click`, this._onResetButtonClick);
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }
