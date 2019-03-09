@@ -2,6 +2,20 @@ import {getRandomNumber, createElement} from './utils';
 
 const OFFER_PRICE_MAX_QUANTITY = 500;
 
+const renderListItem = function (offers) {
+  const randomPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
+  const offersList = Array.from(offers).map((offer) => {
+    return `
+          <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}">
+          <label for="${offer}" class="point__offers-label">
+            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${randomPrice}</span>
+          </label>
+          `;
+  });
+
+  return offersList.join(``);
+};
+
 export class EditPoint {
   constructor(data) {
     this._icon = data.icon;
@@ -22,19 +36,6 @@ export class EditPoint {
   }
 
   get template() {
-    const renderListItem = function (offers) {
-      const randomPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
-      const offersList = Array.from(offers).map((offer) => {
-        return `
-          <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}">
-          <label for="${offer}" class="point__offers-label">
-            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${randomPrice}</span>
-          </label>
-          `;
-      });
-
-      return offersList.join(``);
-    };
 
     return (
       `<article class="point">
