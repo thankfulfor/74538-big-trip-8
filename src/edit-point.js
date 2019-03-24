@@ -1,5 +1,6 @@
 import {getRandomNumber} from './utils';
 import {Component} from './component';
+import flatpickr from 'flatpickr';
 
 const OFFER_PRICE_MAX_QUANTITY = 500;
 
@@ -7,7 +8,7 @@ export class EditPoint extends Component {
   constructor(data) {
     super();
     this._icon = data.icon;
-    this._title = data.title;
+    this._activity = data.activity;
     this._city = data.city;
     this._picture = data.picture;
     this._descriptions = data.descriptions;
@@ -22,13 +23,54 @@ export class EditPoint extends Component {
     this._onResetButtonClick = this._onResetButtonClick.bind(this);
   }
 
+  update(data) {
+    this._icon = data.icon;
+    this._activity = data.activity;
+    this._city = data.city;
+    this._time = data.time;
+    this._price = data.price;
+    this._offers = data.offers;
+  }
+
+  static createMapper(target) {
+    return {
+      icon: (value) => (target.icon = value),
+      activity: (value) => (target.activity = value),
+      city: (value) => (target.city = value),
+      time: (value) => (target.time = value),
+      price: (value) => (target.price = value),
+      offers: (value) => target.offers.add(value),
+    };
+  }
+
+  _processForm(formData) {
+    const entry = {
+      icon: ``,
+      activity: ``,
+      city: ``,
+      time: new Date(),
+      price: ``,
+      offers: new Set(),
+    };
+
+    const editPointMapper = EditPoint.createMapper(entry);
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+
+      if (editPointMapper[property]) {
+        editPointMapper[property](value);
+      }
+    }
+    return entry;
+  }
+
   _renderListItem(offers) {
-    const randomPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
+    const randomOfferPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
     const offersList = Array.from(offers).map((offer) => {
       return `
           <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}">
           <label for="${offer}" class="point__offers-label">
-            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${randomPrice}</span>
+            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${randomOfferPrice}</span>
           </label>
           `;
     });
@@ -39,7 +81,7 @@ export class EditPoint extends Component {
   get template() {
     return (
       `<article class="point">
-        <form action="" method="get">
+        <form action="" class="point__form" method="get">
           <header class="point__header">
             <label class="point__date">
               choose day
@@ -77,7 +119,7 @@ export class EditPoint extends Component {
             </div>
       
             <div class="point__destination-wrap">
-              <label class="point__destination-label" for="destination">${this._title}</label>
+              <label class="point__destination-label" for="destination">${this._activity}</label>
               <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
               <datalist id="destination-select">
                 <option value="airport"></option>
@@ -90,7 +132,7 @@ export class EditPoint extends Component {
             <label class="point__time">
               choose time
               <input
-                class="point__input"
+                class="point__input point__input--time"
                 type="text"
                 value="${this._time.randomTimeFromFormatted} &mdash; ${this._time.randomTimeToFormatted}"
                 name="time"
@@ -140,10 +182,6 @@ export class EditPoint extends Component {
     );
   }
 
-  get element() {
-    return this._element;
-  }
-
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
@@ -154,9 +192,12 @@ export class EditPoint extends Component {
 
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
+    const formData = new FormData(this._element.querySelector(`.point__form`));
+    const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
+      this._onSubmit(newData);
     }
+    this.update(newData);
   }
 
   _onResetButtonClick() {
@@ -171,6 +212,10 @@ export class EditPoint extends Component {
 
     this._element.querySelector(`.point__button--delete`)
       .addEventListener(`click`, this._onResetButtonClick);
+
+    const inputTimeElement = this._element.querySelector(`.point__input--time`);
+    // eslint-disable-next-line camelcase
+    flatpickr(inputTimeElement, {enableTime: true, time_24hr: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
   }
 
   unbind() {

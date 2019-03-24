@@ -1,37 +1,65 @@
 import {getRandomNumber} from './utils';
+import moment from 'moment';
 
 const MILLISECONDS_IN_TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-const MILLISECONDS_IN_HOUR = 60 * 60 * 1000;
+const MILLISECONDS_IN_3_HOURS = 3 * 60 * 60 * 1000;
 const DAYS_IN_WEEK = 7;
 const DESCRIPTION_MAX_QUANTITY = 3;
 const OFFER_MAX_QUANTITY = 3;
 export const PRICE_MAX_QUANTITY = 1000;
 
 const events = [
-  `Taxi`,
-  `Bus`,
-  `Train`,
-  `Ship`,
-  `Transport`,
-  `Drive`,
-  `Flight`,
-  `Check-in`,
-  `Sightseeing`,
-  `Restaurant`,
+  {
+    title: `Bus`,
+    activity: `Bus to `,
+    icon: `🚌`,
+  },
+  {
+    title: `Check-in`,
+    activity: `Check into hotel at `,
+    icon: `🏨`,
+  },
+  {
+    title: `Drive`,
+    activity: `Drive to `,
+    icon: `🚗`,
+  },
+  {
+    title: `Flight`,
+    activity: `️Flight to `,
+    icon: `✈️`,
+  },
+  {
+    title: `Restaurant`,
+    activity: `Restaurant at `,
+    icon: `🍴`,
+  },
+  {
+    title: `Ship`,
+    activity: `Ship to ️`,
+    icon: `🛳️`,
+  },
+  {
+    title: `Sightseeing`,
+    activity: `️Sightseeing at `,
+    icon: `🏛️`,
+  },
+  {
+    title: `Taxi`,
+    activity: `Taxi to `,
+    icon: `🚕`,
+  },
+  {
+    title: `Train`,
+    activity: `Train to `,
+    icon: `🚂`,
+  },
+  {
+    title: `Transport`,
+    activity: `Transport to `,
+    icon: `🚊`,
+  }
 ];
-
-const icons = {
-  'Taxi': `🚕`,
-  'Bus': `🚌`,
-  'Train': `🚂`,
-  'Ship': `🛳️`,
-  'Transport': `🚊`,
-  'Drive': `🚗`,
-  'Flight': `✈️`,
-  'Check-in': `🏨`,
-  'Sightseeing': `🏛️`,
-  'Restaurant': `🍴`,
-};
 
 const cities = new Set([
   `Abidjan`,
@@ -96,19 +124,6 @@ const offers = new Set([
   `Choose seats`,
 ]);
 
-const activities = {
-  'Taxi': `Taxi to `,
-  'Bus': `Bus to `,
-  'Train': `Train to `,
-  'Ship': `Ship to ️`,
-  'Transport': `Transport to `,
-  'Drive': `Drive to `,
-  'Flight': `️Flight to `,
-  'Check-in': `Check into hotel at `,
-  'Sightseeing': `️Sightseeing at `,
-  'Restaurant': `Restaurant at `,
-};
-
 const placeholderTexts = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non
 porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.
 Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae,
@@ -116,49 +131,51 @@ sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismo
 Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.
 In rutrum ac purus sit amet tempus.`.split(`. `);
 
-const getFormatedTime = (miliseconds) => {
-  return new Date(miliseconds).toLocaleString(`en-US`, {
-    hour: `numeric`,
-    minute: `numeric`,
-    hour12: false
-  });
+const getRandomEvent = () => {
+  return events[getRandomNumber(events.length)];
 };
 
-export const getPointData = () => ({
-  randomEvent: events[getRandomNumber(events.length)],
-  get icon() {
-    return icons[this.randomEvent];
-  },
-  get title() {
-    return activities[this.randomEvent];
-  },
-  city: Array.from(cities)[getRandomNumber(cities.size)],
-  picture: `http://picsum.photos/100/100?r=${Math.random()}`,
-  get descriptions() {
-    let statements = ``;
-    for (let i = 0; i <= getRandomNumber(DESCRIPTION_MAX_QUANTITY); i++) {
-      statements += placeholderTexts[i] + `. `;
-    }
-    return statements.trim();
-  },
-  date: new Date(Date.now() + getRandomNumber(DAYS_IN_WEEK) * MILLISECONDS_IN_TWENTY_FOUR_HOURS),
-  get time() {
-    const randomTimeFrom = Date.now() + Math.round(getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
-    const randomTimeTo = randomTimeFrom + Math.round(getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
-    const duration = Math.round((randomTimeTo - randomTimeFrom) / MILLISECONDS_IN_HOUR);
-    const randomTimeFromFormatted = getFormatedTime(randomTimeFrom);
-    const randomTimeToFormatted = getFormatedTime(randomTimeTo);
-    const durationFormatted = getFormatedTime(duration);
-    return {randomTimeFromFormatted, randomTimeToFormatted, durationFormatted};
-  },
-  get price() {
-    return getRandomNumber(PRICE_MAX_QUANTITY);
-  },
-  get offers() {
-    const randomOffersSet = new Set();
-    for (let i = 0; i < getRandomNumber(OFFER_MAX_QUANTITY); i++) {
-      randomOffersSet.add(Array.from(offers)[getRandomNumber(offers.size)]);
-    }
-    return randomOffersSet;
-  },
-});
+const getDescriptions = () => {
+  let statements = ``;
+  for (let i = 0; i <= getRandomNumber(DESCRIPTION_MAX_QUANTITY); i++) {
+    statements += placeholderTexts[i] + `. `;
+  }
+  return statements.trim();
+};
+
+const getTime = () => {
+  const startTimeMS = Date.now() + Math.floor(getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
+  const endTimeMS = startTimeMS + Math.round(getRandomNumber(MILLISECONDS_IN_TWENTY_FOUR_HOURS));
+  const durationMS = (moment(endTimeMS).diff(moment(startTimeMS), `milliseconds`)) - MILLISECONDS_IN_3_HOURS;
+  const endTime = moment(endTimeMS).format(`H:mm`);
+  const startTime = moment(startTimeMS).format(`H:mm`);
+  const duration = moment(durationMS).format(`H:mm`);
+  return {startTime, endTime, duration};
+};
+
+const getOffers = () => {
+  const randomOffersSet = new Set();
+  for (let i = 0; i < getRandomNumber(OFFER_MAX_QUANTITY); i++) {
+    randomOffersSet.add(Array.from(offers)[getRandomNumber(offers.size)]);
+  }
+  return randomOffersSet;
+};
+
+export const getPointData = () => {
+  const randomEvent = getRandomEvent();
+  const randomPrice = getRandomNumber(PRICE_MAX_QUANTITY);
+  const randomTime = getTime();
+  const randomOffers = getOffers();
+  return ({
+    event: randomEvent,
+    icon: randomEvent.icon,
+    activity: randomEvent.activity,
+    city: Array.from(cities)[getRandomNumber(cities.size)],
+    picture: `http://picsum.photos/100/100?r=${Math.random()}`,
+    descriptions: getDescriptions(),
+    date: new Date(Date.now() + getRandomNumber(DAYS_IN_WEEK) * MILLISECONDS_IN_TWENTY_FOUR_HOURS),
+    time: randomTime,
+    price: randomPrice,
+    offers: randomOffers,
+  });
+};
