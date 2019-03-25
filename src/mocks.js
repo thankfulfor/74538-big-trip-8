@@ -169,6 +169,7 @@ export const getPointData = () => {
   return ({
     event: randomEvent,
     icon: randomEvent.icon,
+    title: randomEvent.title,
     activity: randomEvent.activity,
     city: Array.from(cities)[getRandomNumber(cities.size)],
     picture: `http://picsum.photos/100/100?r=${Math.random()}`,

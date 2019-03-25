@@ -7,6 +7,7 @@ export class Point extends Component {
   constructor(data) {
     super();
     this._icon = data.icon;
+    this._title = data.title;
     this._activity = data.activity;
     this._city = data.city;
     this._time = data.time;
@@ -28,6 +29,7 @@ export class Point extends Component {
 
   update(data) {
     this._icon = data.icon;
+    this._title = data.title;
     this._activity = data.activity;
     this._city = data.city;
     this._time = data.time;
@@ -39,7 +41,7 @@ export class Point extends Component {
     return (
       `<article class="trip-point">
         <i class="trip-icon">${this._icon}</i>
-        <h3 class="trip-point__title">${this._activity + this._city}</h3>
+        <h3 class="trip-point__title">${this._activity + ` ` + this._city}</h3>
         <p class="trip-point__schedule">
           <span class="trip-point__timetable">${this._time.startTime} – ${this._time.endTime}</span>
             <span class="trip-point__duration">${this._time.duration}</span>
