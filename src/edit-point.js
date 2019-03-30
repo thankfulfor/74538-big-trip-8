@@ -60,7 +60,6 @@ export class EditPoint extends Component {
     const editPointMapper = EditPoint.createMapper(entry);
     for (const pair of formData.entries()) {
       const [property, value] = pair;
-      console.log(pair)
       if (editPointMapper[property]) {
         editPointMapper[property](value);
       }
