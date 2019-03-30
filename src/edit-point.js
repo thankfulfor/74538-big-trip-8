@@ -1,6 +1,6 @@
 import {Component} from './component';
 import flatpickr from 'flatpickr';
-import {renderEvents} from './render-events';
+import {renderEvents, events} from './render-events';
 import {renderOffers} from './render-offers';
 
 export class EditPoint extends Component {
@@ -35,10 +35,9 @@ export class EditPoint extends Component {
 
   static createMapper(target) {
     return {
-      icon: (value) => (target.icon = value),
+      icon: (value) => (target.icon = events[value].icon),
       destination: (value) => (target.city = value),
       travelWay: (value) => (target.activity = value),
-      activity: (value) => (target.activity = value),
       time: (value) => (target.time.startTime = value),
       price: (value) => (target.price = value),
       offer: (value) => target.offers.add(value),
@@ -61,9 +60,13 @@ export class EditPoint extends Component {
     const editPointMapper = EditPoint.createMapper(entry);
     for (const pair of formData.entries()) {
       const [property, value] = pair;
-
+      console.log(pair)
       if (editPointMapper[property]) {
         editPointMapper[property](value);
+      }
+      if (property === `travelWay`) {
+        entry.icon = events[value].icon;
+        entry.activity = events[value].activity;
       }
     }
     return entry;
@@ -184,7 +187,17 @@ export class EditPoint extends Component {
 
     const inputTimeElement = this._element.querySelector(`.point__input--time`);
     // eslint-disable-next-line camelcase
-    flatpickr(inputTimeElement, {mode: `range`, enableTime: true, time_24hr: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+    flatpickr(inputTimeElement, {defaultDate: this._time.startTime, enableTime: true, time_24hr: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+
+    const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
+    travelInputsCollection.forEach(function (travelInput) {
+      travelInput.addEventListener(`click`, function () {
+        travelInput.setAttribute(`checked`, true);
+        document.querySelector(`.point__destination-label`).innerText = events[travelInput.value].activity;
+        document.querySelector(`.travel-way__label`).innerText = events[travelInput.value].icon;
+        document.querySelector(`.travel-way__toggle`).checked = false;
+      });
+    });
   }
 
   unbind() {

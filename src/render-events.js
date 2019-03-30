@@ -58,11 +58,12 @@ const renderGroupElement = (event, icon) => {
       type="radio"
       id="travel-way-${event}"
       name="travelWay"
-      value="${events[event].activity}"
+      value="${event}"
       ${events[event].icon === icon ? `checked` : ``}>
      <label class="travel-way__select-label" for="travel-way-${event}">${events[event].icon} ${event}</label>`
   );
 };
+
 
 const firstGroupElements = [];
 const secondGroupElements = [];
@@ -73,7 +74,6 @@ Object.keys(events).filter(function (event) {
 
 const renderElements = (group, icon) => {
   return group.map((groupElement) => renderGroupElement(groupElement, icon)).join(``);
-
 };
 
 export const renderEvents = (currentIcon) => {
@@ -89,5 +89,3 @@ export const renderEvents = (currentIcon) => {
     </div>`
   );
 };
-
-
