@@ -1,5 +1,5 @@
 import {getRandomNumber} from './utils';
-import renderFilter from './renderFilter.js';
+import renderFilter from './render-filter.js';
 import {getPoints} from './mocks';
 import {Point} from './point';
 import {EditPoint} from './edit-point';
