@@ -1,5 +1,6 @@
 import {Component} from './component';
 import flatpickr from 'flatpickr';
+import moment from 'moment';
 import {renderEvents, events} from './render-events';
 import {renderOffers} from './render-offers';
 
@@ -18,10 +19,12 @@ export class EditPoint extends Component {
     this._renderEvents = renderEvents;
     this._renderOffers = renderOffers;
 
+    this._isDeleted = data.isDeleted;
+
     this._onSubmit = null;
-    this._onReset = null;
+    this._onDelete = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
-    this._onResetButtonClick = this._onResetButtonClick.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
   }
 
   update(data) {
@@ -55,6 +58,7 @@ export class EditPoint extends Component {
       price: ``,
       offers: new Set(),
       activity: ``,
+      isDeleted: false,
     };
 
     const editPointMapper = EditPoint.createMapper(entry);
@@ -88,7 +92,7 @@ export class EditPoint extends Component {
           <header class="point__header">
             <label class="point__date">
               choose day
-              <input class="point__input" type="text" placeholder="${this._date}" name="day">
+              <input class="point__input" type="text" placeholder="${moment(this._date).format(`LL`)}" name="day">
             </label>
       
             <div class="travel-way">
@@ -167,13 +171,14 @@ export class EditPoint extends Component {
     this._onSubmit = fn;
   }
 
-  set onReset(fn) {
-    this._onReset = fn;
+  set onDelete(fn) {
+    this._onDelete = fn;
   }
 
-  _onResetButtonClick() {
-    if (typeof this._onReset === `function`) {
-      this._onReset();
+  _onDeleteButtonClick() {
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
+      console.log(this._isDeleted)
     }
   }
 
@@ -182,7 +187,7 @@ export class EditPoint extends Component {
       .addEventListener(`click`, this._onSubmitButtonClick);
 
     this._element.querySelector(`.point__button--delete`)
-      .addEventListener(`click`, this._onResetButtonClick);
+      .addEventListener(`click`, this._onDeleteButtonClick);
 
     const inputTimeElement = this._element.querySelector(`.point__input--time`);
     // eslint-disable-next-line camelcase
@@ -204,6 +209,6 @@ export class EditPoint extends Component {
       .removeEventListener(`click`, this._onSubmitButtonClick);
 
     this._element.querySelector(`.point__button--delete`)
-      .removeEventListener(`click`, this._onResetButtonClick);
+      .removeEventListener(`click`, this._onDeleteButtonClick);
   }
 }

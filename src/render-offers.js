@@ -1,7 +1,6 @@
 import {getRandomNumber} from './utils';
 const OFFER_PRICE_MAX_QUANTITY = 500;
 
-
 export const renderOffers = (offers) => {
   const randomOfferPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
   const offersList = Array.from(offers).map((offer) => {
