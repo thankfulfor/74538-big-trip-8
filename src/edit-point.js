@@ -1,13 +1,13 @@
-import {getRandomNumber} from './utils';
 import {Component} from './component';
-
-const OFFER_PRICE_MAX_QUANTITY = 500;
+import flatpickr from 'flatpickr';
+import {renderEvents, events} from './render-events';
+import {renderOffers} from './render-offers';
 
 export class EditPoint extends Component {
   constructor(data) {
     super();
     this._icon = data.icon;
-    this._title = data.title;
+    this._activity = data.activity;
     this._city = data.city;
     this._picture = data.picture;
     this._descriptions = data.descriptions;
@@ -15,6 +15,8 @@ export class EditPoint extends Component {
     this._time = data.time;
     this._price = data.price;
     this._offers = data.offers;
+    this._renderEvents = renderEvents;
+    this._renderOffers = renderOffers;
 
     this._onSubmit = null;
     this._onReset = null;
@@ -22,24 +24,67 @@ export class EditPoint extends Component {
     this._onResetButtonClick = this._onResetButtonClick.bind(this);
   }
 
-  _renderListItem(offers) {
-    const randomPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
-    const offersList = Array.from(offers).map((offer) => {
-      return `
-          <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}">
-          <label for="${offer}" class="point__offers-label">
-            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${randomPrice}</span>
-          </label>
-          `;
-    });
+  update(data) {
+    this._icon = data.icon;
+    this._activity = data.activity;
+    this._city = data.city;
+    this._time = data.time;
+    this._price = data.price;
+    this._offers = data.offers;
+  }
 
-    return offersList.join(``);
+  static createMapper(target) {
+    return {
+      icon: (value) => (target.icon = events[value].icon),
+      destination: (value) => (target.city = value),
+      travelWay: (value) => (target.activity = value),
+      time: (value) => (target.time.startTime = value),
+      price: (value) => (target.price = value),
+      offer: (value) => target.offers.add(value),
+    };
+  }
+
+  _processForm(formData) {
+    const entry = {
+      icon: ``,
+      title: ``,
+      travelWay: ``,
+      destination: ``,
+      city: ``,
+      time: new Date(),
+      price: ``,
+      offers: new Set(),
+      activity: ``,
+    };
+
+    const editPointMapper = EditPoint.createMapper(entry);
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (editPointMapper[property]) {
+        editPointMapper[property](value);
+      }
+      if (property === `travelWay`) {
+        entry.icon = events[value].icon;
+        entry.activity = events[value].activity;
+      }
+    }
+    return entry;
+  }
+
+  _onSubmitButtonClick(evt) {
+    evt.preventDefault();
+    const formData = new FormData(this._element.querySelector(`.point__form`));
+    const newData = this._processForm(formData);
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
+    this.update(newData);
   }
 
   get template() {
     return (
       `<article class="point">
-        <form action="" method="get">
+        <form action="" class="point__form" method="get">
           <header class="point__header">
             <label class="point__date">
               choose day
@@ -47,37 +92,15 @@ export class EditPoint extends Component {
             </label>
       
             <div class="travel-way">
+            
               <label class="travel-way__label" for="travel-way__toggle">${this._icon}️</label>
-      
               <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
       
-              <div class="travel-way__select">
-                <div class="travel-way__select-group">
-                  <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi" name="travel-way" value="taxi">
-                  <label class="travel-way__select-label" for="travel-way-taxi">🚕 taxi</label>
-      
-                  <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-bus" name="travel-way" value="bus">
-                  <label class="travel-way__select-label" for="travel-way-bus">🚌 bus</label>
-      
-                  <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
-                  <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
-      
-                  <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
-                  <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
-                </div>
-      
-                <div class="travel-way__select-group">
-                  <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
-                  <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
-      
-                  <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
-                  <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
-                </div>
-              </div>
+              ${this._renderEvents(this._icon)}
             </div>
       
             <div class="point__destination-wrap">
-              <label class="point__destination-label" for="destination">${this._title}</label>
+              <label class="point__destination-label" for="destination">${this._activity}</label>
               <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
               <datalist id="destination-select">
                 <option value="airport"></option>
@@ -90,11 +113,11 @@ export class EditPoint extends Component {
             <label class="point__time">
               choose time
               <input
-                class="point__input"
+                class="point__input point__input--time"
                 type="text"
-                value="${this._time.randomTimeFromFormatted} &mdash; ${this._time.randomTimeToFormatted}"
+                value="${this._time.startTime} – ${this._time.endTime}"
                 name="time"
-                placeholder="${this._time.randomTimeFromFormatted} &mdash; ${this._time.randomTimeToFormatted}"
+                placeholder="${this._time.startTime} – ${this._time.endTime}"
               >
             </label>
       
@@ -120,7 +143,7 @@ export class EditPoint extends Component {
               <h3 class="point__details-title">offers</h3>
       
               <div class="point__offers-wrap">
-                ${this._renderListItem(this._offers)}
+                ${this._renderOffers(this._offers)}
               </div>
       
             </section>
@@ -140,23 +163,12 @@ export class EditPoint extends Component {
     );
   }
 
-  get element() {
-    return this._element;
-  }
-
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
 
   set onReset(fn) {
     this._onReset = fn;
-  }
-
-  _onSubmitButtonClick(evt) {
-    evt.preventDefault();
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
-    }
   }
 
   _onResetButtonClick() {
@@ -171,6 +183,20 @@ export class EditPoint extends Component {
 
     this._element.querySelector(`.point__button--delete`)
       .addEventListener(`click`, this._onResetButtonClick);
+
+    const inputTimeElement = this._element.querySelector(`.point__input--time`);
+    // eslint-disable-next-line camelcase
+    flatpickr(inputTimeElement, {defaultDate: this._time.startTime, enableTime: true, time_24hr: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+
+    const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
+    travelInputsCollection.forEach(function (travelInput) {
+      travelInput.addEventListener(`click`, function () {
+        travelInput.setAttribute(`checked`, true);
+        document.querySelector(`.point__destination-label`).innerText = events[travelInput.value].activity;
+        document.querySelector(`.travel-way__label`).innerText = events[travelInput.value].icon;
+        document.querySelector(`.travel-way__toggle`).checked = false;
+      });
+    });
   }
 
   unbind() {

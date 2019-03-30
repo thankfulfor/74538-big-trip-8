@@ -8,6 +8,7 @@ export class Point extends Component {
     super();
     this._icon = data.icon;
     this._title = data.title;
+    this._activity = data.activity;
     this._city = data.city;
     this._time = data.time;
     this._price = data.price;
@@ -26,16 +27,26 @@ export class Point extends Component {
     return offersList.join(``);
   }
 
+  update(data) {
+    this._icon = data.icon;
+    this._title = data.title;
+    this._activity = data.activity;
+    this._city = data.city;
+    this._time = data.time;
+    this._price = data.price;
+    this._offers = data.offers;
+  }
+
   get template() {
     return (
       `<article class="trip-point">
         <i class="trip-icon">${this._icon}</i>
-        <h3 class="trip-point__title">${this._title + this._city}</h3>
+        <h3 class="trip-point__title">${this._activity + ` ` + this._city}</h3>
         <p class="trip-point__schedule">
-          <span class="trip-point__timetable">${this._time.randomTimeFromFormatted} &mdash; ${this._time.randomTimeToFormatted}</span>
-          <span class="trip-point__duration">${this._time.durationFormatted}</span>
-        </p>
-        <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
+          <span class="trip-point__timetable">${this._time.startTime} – ${this._time.endTime}</span>
+            <span class="trip-point__duration">${this._time.duration}</span>
+            </p>
+            <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
         <ul class="trip-point__offers">
           ${this._renderListItem(this._offers)}
         </ul>

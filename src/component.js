@@ -21,6 +21,12 @@ export class Component {
 
   unbind() {}
 
+  update() {}
+
+  addEventListener() {}
+
+  removeEventListener() {}
+
   render() {
     this._element = createElement(this.template);
     this.bind();

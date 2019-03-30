@@ -60,23 +60,32 @@ const showFilters = function (parentElement, filterType, filtersArray) {
 };
 
 const renderPoint = function (data) {
-  const taskComponent = new Point(data);
-  pointParentElement.appendChild(taskComponent.render());
+  const pointComponent = new Point(data);
+  pointParentElement.appendChild(pointComponent.render());
   const editPointComponent = new EditPoint(data);
 
   const replaceComponents = function () {
-    taskComponent.render();
-    pointParentElement.replaceChild(taskComponent.element, editPointComponent.element);
+    pointComponent.render();
+    pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
+    editPointComponent.removeEventListener();
     editPointComponent.unrender();
   };
 
-  taskComponent.onEdit = () => {
+  pointComponent.onEdit = () => {
     editPointComponent.render();
-    pointParentElement.replaceChild(editPointComponent.element, taskComponent.element);
-    taskComponent.unrender();
+    editPointComponent.addEventListener();
+    pointParentElement.replaceChild(editPointComponent.element, pointComponent.element);
+    pointComponent.unrender();
   };
 
-  editPointComponent.onSubmit = () => {
+  editPointComponent.onSubmit = (newObject) => {
+    data.icon = newObject.icon;
+    data.activity = newObject.activity;
+    data.city = newObject.city;
+    data.time = newObject.time;
+    data.price = newObject.price;
+    data.offers = newObject.offers;
+    pointComponent.update(data);
     replaceComponents();
   };
 
