@@ -67,13 +67,11 @@ const renderPoint = function (data) {
   const replaceComponents = function () {
     pointComponent.render();
     pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
-    editPointComponent.removeEventListener();
     editPointComponent.unrender();
   };
 
   pointComponent.onEdit = () => {
     editPointComponent.render();
-    editPointComponent.addEventListener();
     pointParentElement.replaceChild(editPointComponent.element, pointComponent.element);
     pointComponent.unrender();
   };
