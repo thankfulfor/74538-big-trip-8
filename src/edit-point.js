@@ -178,7 +178,6 @@ export class EditPoint extends Component {
   _onDeleteButtonClick() {
     if (typeof this._onDelete === `function`) {
       this._onDelete();
-      console.log(this._isDeleted)
     }
   }
 
