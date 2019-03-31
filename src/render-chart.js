@@ -2,6 +2,9 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getPrices, getTransportWays} from './main.js';
 
+let moneyChart = {};
+let transportChart = {};
+
 export const renderChart = () => {
   const moneyCtx = document.querySelector(`.statistic__money`);
   const transportCtx = document.querySelector(`.statistic__transport`);
@@ -9,8 +12,19 @@ export const renderChart = () => {
   const BAR_HEIGHT = 55;
   moneyCtx.height = BAR_HEIGHT * 6;
   transportCtx.height = BAR_HEIGHT * 4;
-  // eslint-disable-next-line no-unused-vars
-  const moneyChart = new Chart(moneyCtx, {
+
+  const clearChart = () => {
+    if (typeof moneyChart.destroy === `function`) {
+      moneyChart.destroy();
+    }
+    if (typeof transportChart.destroy === `function`) {
+      transportChart.destroy();
+    }
+  };
+
+  clearChart();
+
+  moneyChart = new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
@@ -75,8 +89,7 @@ export const renderChart = () => {
     }
   });
 
-  // eslint-disable-next-line no-unused-vars
-  const transportChart = new Chart(transportCtx, {
+  transportChart = new Chart(transportCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
@@ -141,3 +154,5 @@ export const renderChart = () => {
     }
   });
 };
+
+
