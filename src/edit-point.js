@@ -41,7 +41,8 @@ export class EditPoint extends Component {
       icon: (value) => (target.icon = events[value].icon),
       destination: (value) => (target.city = value),
       travelWay: (value) => (target.activity = value),
-      time: (value) => (target.time.startTime = value),
+      dateStart: (value) => (target.time.startTime = value),
+      dateEnd: (value) => (target.time.endTime = value),
       price: (value) => (target.price = value),
       offer: (value) => target.offers.add(value),
     };
@@ -89,23 +90,29 @@ export class EditPoint extends Component {
     return (
       `<article class="point">
         <form action="" class="point__form" method="get">
+      
           <header class="point__header">
+      
             <label class="point__date">
               choose day
               <input class="point__input" type="text" placeholder="${moment(this._date).format(`LL`)}" name="day">
             </label>
       
             <div class="travel-way">
-            
               <label class="travel-way__label" for="travel-way__toggle">${this._icon}️</label>
               <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
-      
               ${this._renderEvents(this._icon)}
             </div>
       
             <div class="point__destination-wrap">
               <label class="point__destination-label" for="destination">${this._activity}</label>
-              <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
+              <input
+                  class="point__destination-input"
+                  list="destination-select"
+                  id="destination"
+                  value="${this._city}"
+                  name="destination"
+              />
               <datalist id="destination-select">
                 <option value="airport"></option>
                 <option value="Geneva"></option>
@@ -114,16 +121,23 @@ export class EditPoint extends Component {
               </datalist>
             </div>
       
-            <label class="point__time">
+            <div class="point__time">
               choose time
               <input
-                class="point__input point__input--time"
-                type="text"
-                value="${this._time.startTime} – ${this._time.endTime}"
-                name="time"
-                placeholder="${this._time.startTime} – ${this._time.endTime}"
-              >
-            </label>
+                  class="point__input"
+                  type="text"
+                  value="${this._time.startTime}"
+                  name="dateStart"
+                  placeholder="${this._time.startTime}"
+              />
+              <input
+                  class="point__input"
+                  type="text"
+                  value="${this._time.endTime}"
+                  name="dateEnd"
+                  placeholder="${this._time.endTime}"
+              />
+            </div>
       
             <label class="point__price">
               write price
@@ -143,14 +157,14 @@ export class EditPoint extends Component {
           </header>
       
           <section class="point__details">
+            
             <section class="point__offers">
               <h3 class="point__details-title">offers</h3>
-      
               <div class="point__offers-wrap">
                 ${this._renderOffers(this._offers)}
               </div>
-      
             </section>
+            
             <section class="point__destination">
               <h3 class="point__details-title">Destination</h3>
               <p class="point__destination-text">
@@ -160,7 +174,9 @@ export class EditPoint extends Component {
                 <img src="${this._picture}" alt="picture from place" class="point__destination-image">
               </div>
             </section>
+            
             <input type="hidden" class="point__total-price" name="total-price" value="">
+            
           </section>
         </form>
       </article>`
@@ -188,9 +204,20 @@ export class EditPoint extends Component {
     this._element.querySelector(`.point__button--delete`)
       .addEventListener(`click`, this._onDeleteButtonClick);
 
-    const inputTimeElement = this._element.querySelector(`.point__input--time`);
-    flatpickr(inputTimeElement, {
+    const startInputTimeElement = this._element.querySelector(`input[name='dateStart']`);
+    const endInputTimeElement = this._element.querySelector(`input[name='dateEnd']`);
+    flatpickr(startInputTimeElement, {
       'defaultDate': this._time.startTime,
+      'enableTime': true,
+      'time_24hr': true,
+      'noCalendar': true,
+      'altInput': true,
+      'altFormat': `H:i`,
+      'dateFormat': `H:i`
+    });
+
+    flatpickr(endInputTimeElement, {
+      'defaultDate': this._time.endTime,
       'enableTime': true,
       'time_24hr': true,
       'noCalendar': true,
