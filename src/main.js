@@ -124,12 +124,16 @@ const points = document.getElementById(`table`);
 const stats = document.getElementById(`stats`);
 
 showStatsButton.addEventListener(`click`, function () {
+  showStatsButton.classList.add(`view-switch__item--active`);
+  showPointsButton.classList.remove(`view-switch__item--active`);
   points.classList.add(`visually-hidden`);
   stats.classList.remove(`visually-hidden`);
   renderChart();
 });
 
 showPointsButton.addEventListener(`click`, function () {
+  showPointsButton.classList.add(`view-switch__item--active`);
+  showStatsButton.classList.remove(`view-switch__item--active`);
   stats.classList.add(`visually-hidden`);
   points.classList.remove(`visually-hidden`);
 });
