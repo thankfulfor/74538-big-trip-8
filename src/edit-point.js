@@ -189,8 +189,15 @@ export class EditPoint extends Component {
       .addEventListener(`click`, this._onDeleteButtonClick);
 
     const inputTimeElement = this._element.querySelector(`.point__input--time`);
-    // eslint-disable-next-line camelcase
-    flatpickr(inputTimeElement, {defaultDate: this._time.startTime, enableTime: true, time_24hr: true, noCalendar: true, altInput: true, altFormat: `H:i`, dateFormat: `H:i`});
+    flatpickr(inputTimeElement, {
+      'defaultDate': this._time.startTime,
+      'enableTime': true,
+      'time_24hr': true,
+      'noCalendar': true,
+      'altInput': true,
+      'altFormat': `H:i`,
+      'dateFormat': `H:i`
+    });
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
     travelInputsCollection.forEach(function (travelInput) {
