@@ -1,10 +1,9 @@
 import {getRandomNumber} from './utils';
-import renderFilter from './renderFilter.js';
-import {getPointData} from './mocks';
+import renderFilter from './render-filter.js';
+import {getPoints} from './mocks';
 import {Point} from './point';
 import {EditPoint} from './edit-point';
-
-const TEMPLATE_POINTS_QUANTITY = 7;
+import {renderChart} from './render-chart';
 
 const filters = [
   {
@@ -39,6 +38,10 @@ const sorters = [
 const filtersParentElement = document.querySelector(`.trip-filter`);
 const sortersParentElement = document.querySelector(`.trip-sorting`);
 const pointParentElement = document.querySelector(`.trip-day__items`);
+const showPointsButton = document.querySelector(`.view-switch__item--table`);
+const showStatsButton = document.querySelector(`.view-switch__item--stats`);
+const table = document.getElementById(`table`);
+const stats = document.getElementById(`stats`);
 
 const filterInputChangeHandler = function () {
   pointParentElement.innerHTML = ``;
@@ -61,19 +64,13 @@ const showFilters = function (parentElement, filterType, filtersArray) {
 
 const renderPoint = function (data) {
   const pointComponent = new Point(data);
-  pointParentElement.appendChild(pointComponent.render());
+  if (!pointComponent._isDeleted) {
+    pointParentElement.appendChild(pointComponent.render());
+  }
   const editPointComponent = new EditPoint(data);
-
-  const replaceComponents = function () {
-    pointComponent.render();
-    pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
-    editPointComponent.removeEventListener();
-    editPointComponent.unrender();
-  };
 
   pointComponent.onEdit = () => {
     editPointComponent.render();
-    editPointComponent.addEventListener();
     pointParentElement.replaceChild(editPointComponent.element, pointComponent.element);
     pointComponent.unrender();
   };
@@ -86,21 +83,141 @@ const renderPoint = function (data) {
     data.price = newObject.price;
     data.offers = newObject.offers;
     pointComponent.update(data);
-    replaceComponents();
+    pointComponent.render();
+    pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
+    editPointComponent.unrender();
   };
 
-  editPointComponent.onReset = () => {
-    replaceComponents();
+  editPointComponent.onDelete = () => {
+    data.isDeleted = true;
+    pointParentElement.removeChild(editPointComponent.element);
+    editPointComponent.unrender();
   };
 };
 
-const showPoints = function (cardsQuantity) {
-  for (let i = 1; i <= cardsQuantity; i++) {
-    renderPoint(getPointData());
+export const pointsList = getPoints();
+
+let filteredEvents = pointsList;
+
+const showPoints = function (points) {
+  for (let i = 0; i < points.length; i++) {
+    renderPoint(points[i]);
   }
+};
+
+const filterEvents = (events, filterName) => {
+  switch (filterName) {
+    default:
+      return events;
+
+    case `filter-future`:
+      return events.filter((it) => it.date < Date.now());
+
+    case `filter-past`:
+      return events.filter((it) => it.date > Date.now());
+  }
+};
+
+filtersParentElement.onchange = (evt) => {
+  const filterName = evt.target.id;
+  filteredEvents = filterEvents(pointsList, filterName);
+  showPoints(filteredEvents);
+  renderChart();
+};
+
+showStatsButton.addEventListener(`click`, function () {
+  showStatsButton.classList.add(`view-switch__item--active`);
+  showPointsButton.classList.remove(`view-switch__item--active`);
+  table.classList.add(`visually-hidden`);
+  stats.classList.remove(`visually-hidden`);
+  renderChart();
+});
+
+showPointsButton.addEventListener(`click`, function () {
+  showPointsButton.classList.add(`view-switch__item--active`);
+  showStatsButton.classList.remove(`view-switch__item--active`);
+  stats.classList.add(`visually-hidden`);
+  table.classList.remove(`visually-hidden`);
+});
+
+export const getPrices = () => {
+  let ridePrice = 0;
+  let stayPrice = 0;
+  let drivePrice = 0;
+  let eatPrice = 0;
+  let lookPrice = 0;
+  let flightPrice = 0;
+
+  const filterPrices = (point) => {
+    switch (point.activity) {
+      case `Bus to `:
+      case `Ship to ️`:
+      case `Taxi to `:
+      case `Train to `:
+      case `Transport to `:
+        ridePrice += point.price;
+        break;
+
+      case `️Flight to `:
+        flightPrice += point.price;
+        break;
+
+      case `Check into hotel at `:
+        stayPrice += point.price;
+        break;
+
+      case `Drive to `:
+        drivePrice += point.price;
+        break;
+
+      case `Restaurant at `:
+        eatPrice += point.price;
+        break;
+
+      case `️Sightseeing at `:
+        lookPrice += point.price;
+        break;
+    }
+  };
+
+  filteredEvents.forEach(filterPrices);
+  return [flightPrice, stayPrice, drivePrice, lookPrice, eatPrice, ridePrice];
+};
+
+export const getTransportWays = () => {
+  let rideCount = 0;
+  let driveCount = 0;
+  let flightCount = 0;
+  let sailCount = 0;
+
+  const filterCounts = (point) => {
+    switch (point.activity) {
+      case `Bus to `:
+      case `Taxi to `:
+      case `Train to `:
+      case `Transport to `:
+        rideCount += 1;
+        break;
+
+      case `️Flight to `:
+        flightCount += 1;
+        break;
+
+      case `Drive to `:
+        driveCount += 1;
+        break;
+
+      case `Ship to ️`:
+        sailCount += 1;
+        break;
+    }
+  };
+
+  filteredEvents.forEach(filterCounts);
+  return [driveCount, rideCount, flightCount, sailCount];
 };
 
 showFilters(filtersParentElement, `filter`, filters);
 showFilters(sortersParentElement, `sorting`, sorters);
-showPoints(TEMPLATE_POINTS_QUANTITY);
+showPoints(pointsList);
 showPointsByClick();

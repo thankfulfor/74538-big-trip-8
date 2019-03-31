@@ -13,6 +13,7 @@ export class Point extends Component {
     this._time = data.time;
     this._price = data.price;
     this._offers = data.offers;
+    this._isDeleted = data.isDeleted;
 
     this._onEdit = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);

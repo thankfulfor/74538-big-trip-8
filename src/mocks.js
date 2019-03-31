@@ -8,6 +8,8 @@ const DESCRIPTION_MAX_QUANTITY = 3;
 const OFFER_MAX_QUANTITY = 3;
 export const PRICE_MAX_QUANTITY = 1000;
 
+const TEMPLATE_POINTS_QUANTITY = 7;
+
 const events = [
   {
     title: `Bus`,
@@ -161,13 +163,12 @@ const getOffers = () => {
   return randomOffersSet;
 };
 
-export const getPointData = () => {
+const getPointData = () => {
   const randomEvent = getRandomEvent();
   const randomPrice = getRandomNumber(PRICE_MAX_QUANTITY);
   const randomTime = getTime();
   const randomOffers = getOffers();
   return ({
-    event: randomEvent,
     icon: randomEvent.icon,
     title: randomEvent.title,
     activity: randomEvent.activity,
@@ -179,4 +180,13 @@ export const getPointData = () => {
     price: randomPrice,
     offers: randomOffers,
   });
+};
+
+
+export const getPoints = function () {
+  const points = [];
+  for (let i = 0; i < TEMPLATE_POINTS_QUANTITY; i++) {
+    points.push(getPointData());
+  }
+  return points;
 };
