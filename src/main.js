@@ -38,6 +38,10 @@ const sorters = [
 const filtersParentElement = document.querySelector(`.trip-filter`);
 const sortersParentElement = document.querySelector(`.trip-sorting`);
 const pointParentElement = document.querySelector(`.trip-day__items`);
+const showPointsButton = document.querySelector(`.view-switch__item--table`);
+const showStatsButton = document.querySelector(`.view-switch__item--stats`);
+const table = document.getElementById(`table`);
+const stats = document.getElementById(`stats`);
 
 const filterInputChangeHandler = function () {
   pointParentElement.innerHTML = ``;
@@ -93,40 +97,38 @@ const renderPoint = function (data) {
 
 export const pointsList = getPoints();
 
+let filteredEvents = pointsList;
+
 const showPoints = function (points) {
   for (let i = 0; i < points.length; i++) {
     renderPoint(points[i]);
   }
 };
 
-const filterEvents = (event, filterName) => {
+const filterEvents = (events, filterName) => {
   switch (filterName) {
     default:
-      return pointsList;
+      return events;
 
     case `filter-future`:
-      return pointsList.filter((it) => it.date < Date.now());
+      return events.filter((it) => it.date < Date.now());
 
     case `filter-past`:
-      return pointsList.filter((it) => it.date > Date.now());
+      return events.filter((it) => it.date > Date.now());
   }
 };
 
 filtersParentElement.onchange = (evt) => {
   const filterName = evt.target.id;
-  const filteredEvents = filterEvents(pointsList, filterName);
+  filteredEvents = filterEvents(pointsList, filterName);
   showPoints(filteredEvents);
+  renderChart();
 };
-
-const showPointsButton = document.querySelector(`.view-switch__item--table`);
-const showStatsButton = document.querySelector(`.view-switch__item--stats`);
-const points = document.getElementById(`table`);
-const stats = document.getElementById(`stats`);
 
 showStatsButton.addEventListener(`click`, function () {
   showStatsButton.classList.add(`view-switch__item--active`);
   showPointsButton.classList.remove(`view-switch__item--active`);
-  points.classList.add(`visually-hidden`);
+  table.classList.add(`visually-hidden`);
   stats.classList.remove(`visually-hidden`);
   renderChart();
 });
@@ -135,7 +137,7 @@ showPointsButton.addEventListener(`click`, function () {
   showPointsButton.classList.add(`view-switch__item--active`);
   showStatsButton.classList.remove(`view-switch__item--active`);
   stats.classList.add(`visually-hidden`);
-  points.classList.remove(`visually-hidden`);
+  table.classList.remove(`visually-hidden`);
 });
 
 export const getPrices = () => {
@@ -178,7 +180,7 @@ export const getPrices = () => {
     }
   };
 
-  pointsList.forEach(filterPrices);
+  filteredEvents.forEach(filterPrices);
   return [flightPrice, stayPrice, drivePrice, lookPrice, eatPrice, ridePrice];
 };
 
@@ -211,7 +213,7 @@ export const getTransportWays = () => {
     }
   };
 
-  pointsList.forEach(filterCounts);
+  filteredEvents.forEach(filterCounts);
   return [driveCount, rideCount, flightCount, sailCount];
 };
 

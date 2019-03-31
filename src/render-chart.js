@@ -10,7 +10,7 @@ export const renderChart = () => {
   moneyCtx.height = BAR_HEIGHT * 6;
   transportCtx.height = BAR_HEIGHT * 4;
   // eslint-disable-next-line no-unused-vars
-  const moneyChart = new Chart(moneyCtx, {
+  new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
