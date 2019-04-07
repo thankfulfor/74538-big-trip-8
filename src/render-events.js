@@ -1,50 +1,50 @@
 export const events = {
-  'Bus': {
+  'bus': {
     activity: `Bus to `,
     icon: `🚌`,
     isTransport: true,
   },
-  'Check-in': {
+  'check-in': {
     activity: `Check into hotel at `,
     icon: `🏨`,
     isTransport: false,
   },
-  'Drive': {
+  'drive': {
     activity: `Drive to `,
     icon: `🚗`,
     isTransport: true,
   },
-  'Flight': {
+  'flight': {
     activity: `️Flight to `,
     icon: `✈️`,
     isTransport: true,
   },
-  'Restaurant': {
+  'restaurant': {
     activity: `Restaurant at `,
     icon: `🍴`,
     isTransport: true,
   },
-  'Ship': {
+  'ship': {
     activity: `Ship to ️`,
     icon: `🛳️`,
     isTransport: true,
   },
-  'Sightseeing': {
+  'sightseeing': {
     activity: `️Sightseeing at `,
     icon: `🏛️`,
     isTransport: false,
   },
-  'Taxi': {
+  'taxi': {
     activity: `Taxi to `,
     icon: `🚕`,
     isTransport: true,
   },
-  'Train': {
+  'train': {
     activity: `Train to `,
     icon: `🚂`,
     isTransport: true,
   },
-  'Transport': {
+  'transport': {
     activity: `Transport to `,
     icon: `🚊`,
     isTransport: true,

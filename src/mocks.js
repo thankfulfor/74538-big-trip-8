@@ -173,7 +173,7 @@ const getPointData = () => {
     title: randomEvent.title,
     activity: randomEvent.activity,
     city: Array.from(cities)[getRandomNumber(cities.size)],
-    picture: `http://picsum.photos/100/100?r=${Math.random()}`,
+    pictures: `http://picsum.photos/100/100?r=${Math.random()}`,
     descriptions: getDescriptions(),
     date: new Date(Date.now() + getRandomNumber(DAYS_IN_WEEK) * MILLISECONDS_IN_TWENTY_FOUR_HOURS),
     time: randomTime,

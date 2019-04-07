@@ -1,13 +1,16 @@
-import {getRandomNumber} from './utils';
-const OFFER_PRICE_MAX_QUANTITY = 500;
-
 export const renderOffers = (offers) => {
-  const randomOfferPrice = getRandomNumber(OFFER_PRICE_MAX_QUANTITY);
-  const offersList = Array.from(offers).map((offer) => {
+  const offersList = offers.map((offer) => {
     return `
-      <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}" checked>
-      <label for="${offer}" class="point__offers-label">
-        <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${randomOfferPrice}</span>
+      <input
+        class="point__offers-input visually-hidden"
+        type="checkbox"
+        id="${offer.title}"
+        name="offer"
+        value="${offer.title}" 
+        ${offer.accepted ? `checked` : ``}
+      />
+        <label for="${offer.title}" class="point__offers-label">
+        <span class="point__offer-service">${offer.title}</span> + €<span class="point__offer-price">${offer.price}</span>
       </label>
       `;
   });

@@ -7,7 +7,6 @@ export class Component {
     }
 
     this._element = null;
-    this._isDeleted = false;
   }
 
   get template() {

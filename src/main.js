@@ -1,9 +1,8 @@
-import {getRandomNumber} from './utils';
 import renderFilter from './render-filter.js';
-import {getPoints} from './mocks';
 import {Point} from './point';
 import {EditPoint} from './edit-point';
 import {renderChart} from './render-chart';
+import {API} from './API.js';
 
 const filters = [
   {
@@ -43,17 +42,9 @@ const showStatsButton = document.querySelector(`.view-switch__item--stats`);
 const table = document.getElementById(`table`);
 const stats = document.getElementById(`stats`);
 
-const filterInputChangeHandler = function () {
-  pointParentElement.innerHTML = ``;
-  showPoints(getRandomNumber());
-};
-
-const showPointsByClick = function () {
-  const filterInputElements = filtersParentElement.querySelectorAll(`[name=filter]`);
-  filterInputElements.forEach(function (filterInputElement) {
-    filterInputElement.addEventListener(`change`, filterInputChangeHandler);
-  });
-};
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAorrdfbfgrr=`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
+export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const showFilters = function (parentElement, filterType, filtersArray) {
   const filterList = filtersArray.map((filtersItem) => {
@@ -62,42 +53,108 @@ const showFilters = function (parentElement, filterType, filtersArray) {
   parentElement.insertAdjacentHTML(`afterbegin`, filterList.join(``));
 };
 
+export let destinations = [];
+export let offers = [];
+
 const renderPoint = function (data) {
   const pointComponent = new Point(data);
-  if (!pointComponent._isDeleted) {
-    pointParentElement.appendChild(pointComponent.render());
-  }
+  pointParentElement.appendChild(pointComponent.render());
+
   const editPointComponent = new EditPoint(data);
 
-  pointComponent.onEdit = () => {
+  const block = () => {
+    const form = editPointComponent.element.querySelector(`.point__form`);
+    const elements = form.elements;
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].readOnly = true;
+    }
+  };
+
+  const unblock = () => {
+    const form = editPointComponent.element.querySelector(`.point__form`);
+    const elements = form.elements;
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].readOnly = false;
+    }
+  };
+
+  const replaceComponents = () => {
     editPointComponent.render();
     pointParentElement.replaceChild(editPointComponent.element, pointComponent.element);
     pointComponent.unrender();
   };
 
+  pointComponent.onEdit = () => {
+    const destinationsList = api.getDestinations();
+    const offersList = api.getOffers();
+    destinationsList
+      .then((value) => {
+        destinations = value;
+      })
+      .then(
+          offersList
+        .then((value) => {
+          offers = value;
+        }
+        ))
+      .then(replaceComponents);
+  };
+
   editPointComponent.onSubmit = (newObject) => {
+
+
     data.icon = newObject.icon;
     data.activity = newObject.activity;
     data.city = newObject.city;
     data.time = newObject.time;
     data.price = newObject.price;
     data.offers = newObject.offers;
-    pointComponent.update(data);
-    pointComponent.render();
-    pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
-    editPointComponent.unrender();
+    data.title = newObject.title;
+
+    const load = (isSuccess) => {
+      return new Promise((response, reject) => {
+        setTimeout(isSuccess ? response : reject, 2000);
+      });
+    };
+
+    block();
+
+    load()
+      .then((newPoint) => {
+        unblock();
+        pointComponent.update(newPoint);
+        pointComponent.render();
+        pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
+        editPointComponent.unrender();
+      })
+      .catch(() => {
+        editPointComponent.shake();
+        unblock();
+      });
+
+    api.updatePoints({id: data.id, data: data.toRAW()})
+      .then((newPoint) => {
+        pointComponent.update(newPoint);
+        pointComponent.render();
+        pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
+        editPointComponent.unrender();
+      });
   };
 
-  editPointComponent.onDelete = () => {
-    data.isDeleted = true;
-    pointParentElement.removeChild(editPointComponent.element);
-    editPointComponent.unrender();
+  editPointComponent.onDelete = ({id}) => {
+    block();
+    api.deleteTask({id})
+      .then(() => api.getPoints())
+      .then(() => {
+        pointParentElement.removeChild(editPointComponent.element);
+        editPointComponent.unrender();
+      })
+      .catch(() => {
+        editPointComponent.shake();
+        unblock();
+      });
   };
 };
-
-export const pointsList = getPoints();
-
-let filteredEvents = pointsList;
 
 const showPoints = function (points) {
   for (let i = 0; i < points.length; i++) {
@@ -111,16 +168,16 @@ const filterEvents = (events, filterName) => {
       return events;
 
     case `filter-future`:
-      return events.filter((it) => it.date < Date.now());
+      return events.filter((it) => it.time.startTime < Date.now());
 
     case `filter-past`:
-      return events.filter((it) => it.date > Date.now());
+      return events.filter((it) => it.time.startTime > Date.now());
   }
 };
 
 filtersParentElement.onchange = (evt) => {
   const filterName = evt.target.id;
-  filteredEvents = filterEvents(pointsList, filterName);
+  filteredEvents = filterEvents(allEvents, filterName);
   showPoints(filteredEvents);
   renderChart();
 };
@@ -148,39 +205,39 @@ export const getPrices = () => {
   let lookPrice = 0;
   let flightPrice = 0;
 
-  const filterPrices = (point) => {
-    switch (point.activity) {
-      case `Bus to `:
-      case `Ship to ️`:
-      case `Taxi to `:
-      case `Train to `:
-      case `Transport to `:
-        ridePrice += point.price;
+  const filterPrices = (event) => {
+    switch (event.title) {
+      case `bus`:
+      case `ship️`:
+      case `taxi`:
+      case `train`:
+      case `transport`:
+        ridePrice += parseInt(event.price, 10);
         break;
 
-      case `️Flight to `:
-        flightPrice += point.price;
+      case `flight`:
+        flightPrice += parseInt(event.price, 10);
         break;
 
-      case `Check into hotel at `:
-        stayPrice += point.price;
+      case `check-in`:
+        stayPrice += parseInt(event.price, 10);
         break;
 
-      case `Drive to `:
-        drivePrice += point.price;
+      case `drive`:
+        drivePrice += parseInt(event.price, 10);
         break;
 
-      case `Restaurant at `:
-        eatPrice += point.price;
+      case `restaurant`:
+        eatPrice += parseInt(event.price, 10);
         break;
 
-      case `️Sightseeing at `:
-        lookPrice += point.price;
+      case `sightseeing`:
+        lookPrice += parseInt(event.price, 10);
         break;
     }
   };
 
-  filteredEvents.forEach(filterPrices);
+  allEvents.forEach(filterPrices);
   return [flightPrice, stayPrice, drivePrice, lookPrice, eatPrice, ridePrice];
 };
 
@@ -212,12 +269,49 @@ export const getTransportWays = () => {
         break;
     }
   };
-
-  filteredEvents.forEach(filterCounts);
+  allEvents.forEach(filterCounts);
   return [driveCount, rideCount, flightCount, sailCount];
 };
 
+const getTotalPrice = () => {
+  const totalPriceElement = document.querySelector(`.trip__total-cost`);
+  let acc = 0;
+  allEvents.forEach(function (event) {
+    acc += parseInt(event.price, 10);
+  });
+
+  totalPriceElement.innerHTML = `&euro;&nbsp;` + acc;
+};
+
+const pointsList = api.getPoints();
+
+const showPreloadMessage = (text) => {
+  pointParentElement.innerHTML = `<div style="font-weight: 900; font-size: 17px; position: fixed; top: 50%; left: 50%; transform: translateX(-50%)">${text}</div>`;
+};
+
+const hidePreloadMessage = () => {
+  pointParentElement.innerHTML = ``;
+};
+
+const loadText = `Loading route...`;
+const errorText = `Something went wrong while loading your route info. Check your connection or try again later`;
+
+let filteredEvents = [];
+let allEvents = [];
+
+showPreloadMessage(loadText);
+
+pointsList
+  .then((points) => {
+    hidePreloadMessage();
+    showPoints(points);
+    allEvents = points;
+  })
+  .then(getTotalPrice)
+  .catch(() => {
+    showPreloadMessage(errorText);
+  });
+
+
 showFilters(filtersParentElement, `filter`, filters);
 showFilters(sortersParentElement, `sorting`, sorters);
-showPoints(pointsList);
-showPointsByClick();
