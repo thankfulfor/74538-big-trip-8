@@ -1,4 +1,4 @@
-export default function (filterType, filterName, checked = false) {
+const renderFilter = function (filterType, filterName, checked = false) {
   const filterNameInLowerCase = filterName.toLowerCase();
   return (
     `<input
@@ -12,6 +12,14 @@ export default function (filterType, filterName, checked = false) {
         class="trip-${filterType}__item trip-${filterType}__item--${filterNameInLowerCase}"
         for="${filterType}-${filterNameInLowerCase}">
         ${filterName}
-      </label>`
+      </label>
+`
   );
-}
+};
+
+export const showFilters = function (filterType, filtersArray) {
+  const filterList = filtersArray.map((filtersItem) => {
+    return renderFilter(filterType, filtersItem.name, filtersItem.checked);
+  });
+  return filterList.join(``);
+};

@@ -23,8 +23,10 @@ export class EditPoint extends Component {
     this._renderOffers = renderOffers;
     this._onSubmit = null;
     this._onDelete = null;
+    this._onEscape = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
+    this._onEscapePress = this._onEscapePress.bind(this);
   }
 
   renderOptions(destinationsListItem) {
@@ -110,6 +112,18 @@ export class EditPoint extends Component {
       this._onSubmit(newData);
     }
     this.update(newData);
+  }
+
+  set onEscape(fn) {
+    this._onEscape = fn;
+  }
+
+  _onEscapePress(evt) {
+    if (evt.keyCode === 27) {
+      if (typeof this._onEscape === `function`) {
+        this._onEscape();
+      }
+    }
   }
 
   get template() {
@@ -236,11 +250,8 @@ export class EditPoint extends Component {
   }
 
   bind() {
-    this._element.querySelector(`.point__button--save`)
-      .addEventListener(`click`, this._onSubmitButtonClick);
-
-    this._element.querySelector(`.point__button--delete`)
-      .addEventListener(`click`, this._onDeleteButtonClick);
+    this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitButtonClick);
+    this._element.querySelector(`.point__button--delete`).addEventListener(`click`, this._onDeleteButtonClick);
 
     const startInputTimeElement = this._element.querySelector(`input[name='dateStart']`);
     const endInputTimeElement = this._element.querySelector(`input[name='dateEnd']`);
@@ -275,7 +286,6 @@ export class EditPoint extends Component {
     };
 
     let newOffers = [];
-
     travelInputsCollection.forEach((travelInput) => {
       travelInput.onclick = () => {
         travelInput.setAttribute(`checked`, true);
@@ -300,7 +310,6 @@ export class EditPoint extends Component {
     const destinationInputElement = this._element.querySelector(`.point__destination-input`);
     const destinationTextElement = this._element.querySelector(`.point__destination-text`);
     const destinationImageElements = this._element.querySelector(`.point__destination-images`);
-
     destinationInputElement.onchange = () => {
       let description = ``;
       let photos = [];
@@ -314,6 +323,8 @@ export class EditPoint extends Component {
       });
       this.updateDesription(photos, description);
     };
+
+    document.addEventListener(`keydown`, this._onEscapePress);
   }
 
   unbind() {
@@ -322,5 +333,7 @@ export class EditPoint extends Component {
 
     this._element.querySelector(`.point__button--delete`)
       .removeEventListener(`click`, this._onDeleteButtonClick);
+
+    document.removeEventListener(`keydown`, this._onEscapePress);
   }
 }

@@ -1,6 +1,8 @@
-import renderFilter from './render-filter.js';
+import {showFilters} from './render-filter.js';
 import {Point} from './point';
 import {EditPoint} from './edit-point';
+import {Cost} from './cost';
+import {Sort} from './sort';
 import {renderChart} from './render-chart';
 import {API} from './API.js';
 
@@ -19,24 +21,10 @@ const filters = [
   }
 ];
 
-const sorters = [
-  {
-    checked: true,
-    name: `Event`,
-  },
-  {
-    checked: false,
-    name: `Time`,
-  },
-  {
-    checked: false,
-    name: `Price`,
-  }
-];
-
 const filtersParentElement = document.querySelector(`.trip-filter`);
-const sortersParentElement = document.querySelector(`.trip-sorting`);
 const pointParentElement = document.querySelector(`.trip-day__items`);
+const totalPriceParentElement = document.querySelector(`.trip__total-cost`);
+const sortersParentElement = document.querySelector(`.trip-sorting`);
 const showPointsButton = document.querySelector(`.view-switch__item--table`);
 const showStatsButton = document.querySelector(`.view-switch__item--stats`);
 const table = document.getElementById(`table`);
@@ -45,22 +33,17 @@ const stats = document.getElementById(`stats`);
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAorrdfbfgrr=`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-
-const showFilters = function (parentElement, filterType, filtersArray) {
-  const filterList = filtersArray.map((filtersItem) => {
-    return renderFilter(filterType, filtersItem.name, filtersItem.checked);
-  });
-  parentElement.insertAdjacentHTML(`afterbegin`, filterList.join(``));
-};
+const costComponent = new Cost();
+const sortComponent = new Sort();
+sortersParentElement.appendChild(sortComponent.render());
 
 export let destinations = [];
 export let offers = [];
 
 const renderPoint = function (data) {
   const pointComponent = new Point(data);
-  pointParentElement.appendChild(pointComponent.render());
-
   const editPointComponent = new EditPoint(data);
+  pointParentElement.appendChild(pointComponent.render());
 
   const block = () => {
     const form = editPointComponent.element.querySelector(`.point__form`);
@@ -95,14 +78,18 @@ const renderPoint = function (data) {
           offersList
         .then((value) => {
           offers = value;
-        }
-        ))
+        })
+      )
       .then(replaceComponents);
   };
 
+  editPointComponent.onEscape = () => {
+    pointComponent.render();
+    pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
+    editPointComponent.unrender();
+  };
+
   editPointComponent.onSubmit = (newObject) => {
-
-
     data.icon = newObject.icon;
     data.activity = newObject.activity;
     data.city = newObject.city;
@@ -111,15 +98,14 @@ const renderPoint = function (data) {
     data.offers = newObject.offers;
     data.title = newObject.title;
 
-    const load = (isSuccess) => {
-      return new Promise((response, reject) => {
-        setTimeout(isSuccess ? response : reject, 2000);
-      });
-    };
+    costComponent.totalPrice(allEvents);
+    costComponent.unrender();
+    totalPriceParentElement.innerHTML = ``;
+    totalPriceParentElement.appendChild(costComponent.render());
 
     block();
 
-    load()
+    api.updatePoints({id: data.id, data: data.toRAW()})
       .then((newPoint) => {
         unblock();
         pointComponent.update(newPoint);
@@ -130,14 +116,6 @@ const renderPoint = function (data) {
       .catch(() => {
         editPointComponent.shake();
         unblock();
-      });
-
-    api.updatePoints({id: data.id, data: data.toRAW()})
-      .then((newPoint) => {
-        pointComponent.update(newPoint);
-        pointComponent.render();
-        pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
-        editPointComponent.unrender();
       });
   };
 
@@ -273,16 +251,6 @@ export const getTransportWays = () => {
   return [driveCount, rideCount, flightCount, sailCount];
 };
 
-const getTotalPrice = () => {
-  const totalPriceElement = document.querySelector(`.trip__total-cost`);
-  let acc = 0;
-  allEvents.forEach(function (event) {
-    acc += parseInt(event.price, 10);
-  });
-
-  totalPriceElement.innerHTML = `&euro;&nbsp;` + acc;
-};
-
 const pointsList = api.getPoints();
 
 const showPreloadMessage = (text) => {
@@ -306,12 +274,12 @@ pointsList
     hidePreloadMessage();
     showPoints(points);
     allEvents = points;
+    costComponent.totalPrice(points);
+    totalPriceParentElement.appendChild(costComponent.render());
   })
-  .then(getTotalPrice)
   .catch(() => {
     showPreloadMessage(errorText);
   });
 
 
-showFilters(filtersParentElement, `filter`, filters);
-showFilters(sortersParentElement, `sorting`, sorters);
+showFilters(`filter`, filters);
