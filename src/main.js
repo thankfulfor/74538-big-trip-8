@@ -30,7 +30,7 @@ const showStatsButton = document.querySelector(`.view-switch__item--stats`);
 const table = document.getElementById(`table`);
 const stats = document.getElementById(`stats`);
 
-const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAorrdfbfgrr=`;
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAorrdfmbfgrr=`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const costComponent = new Cost();
@@ -156,6 +156,7 @@ const filterEvents = (events, filterName) => {
 filtersParentElement.onchange = (evt) => {
   const filterName = evt.target.id;
   filteredEvents = filterEvents(allEvents, filterName);
+  pointParentElement.innerHTML = ``;
   showPoints(filteredEvents);
   renderChart();
 };
@@ -184,6 +185,7 @@ export const getPrices = () => {
   let flightPrice = 0;
 
   const filterPrices = (event) => {
+
     switch (event.title) {
       case `bus`:
       case `ship️`:
