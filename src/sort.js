@@ -24,7 +24,11 @@ export class Sort extends Component {
       }
     ];
     return (
-      `<span>${this._showFilters(`sorting`, sorters)}</span>`
+      `<span>
+        ${this._showFilters(`sorting`, sorters)}
+        <span class="trip-sorting__item trip-sorting__item--offers">Offers</span>
+      </span>
+      `
     );
   }
 

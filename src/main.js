@@ -281,5 +281,4 @@ pointsList
     showPreloadMessage(errorText);
   });
 
-
-showFilters(`filter`, filters);
+filtersParentElement.innerHTML = showFilters(`filter`, filters);
