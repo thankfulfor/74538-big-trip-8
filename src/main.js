@@ -185,7 +185,6 @@ export const getPrices = () => {
   let flightPrice = 0;
 
   const filterPrices = (event) => {
-
     switch (event.title) {
       case `bus`:
       case `ship️`:
@@ -228,23 +227,23 @@ export const getTransportWays = () => {
   let sailCount = 0;
 
   const filterCounts = (point) => {
-    switch (point.activity) {
-      case `Bus to `:
-      case `Taxi to `:
-      case `Train to `:
-      case `Transport to `:
+    switch (point.title) {
+      case `bus`:
+      case `taxi`:
+      case `train`:
+      case `transport`:
         rideCount += 1;
         break;
 
-      case `️Flight to `:
+      case `flight`:
         flightCount += 1;
         break;
 
-      case `Drive to `:
+      case `drive`:
         driveCount += 1;
         break;
 
-      case `Ship to ️`:
+      case `ship`:
         sailCount += 1;
         break;
     }
