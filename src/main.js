@@ -1,10 +1,10 @@
-import {showFilters} from './render-filter.js';
+import {showFilters} from './render-filter';
 import {Point} from './point';
 import {EditPoint} from './edit-point';
 import {Cost} from './cost';
 import {Sort} from './sort';
 import {renderChart} from './render-chart';
-import {API} from './API.js';
+import {API} from './API';
 
 const filters = [
   {

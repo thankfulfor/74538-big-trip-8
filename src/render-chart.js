@@ -1,6 +1,6 @@
-import Chart from 'chart.js';
+import Chart from 'chart';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getPrices, getTransportWays} from './main.js';
+import {getPrices, getTransportWays} from './main';
 
 let moneyChart = {};
 let transportChart = {};
