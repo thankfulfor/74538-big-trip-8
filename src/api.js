@@ -19,7 +19,7 @@ const toJSON = (response) => {
   return response.json();
 };
 
-export const API = class {
+export const Api = class {
   constructor({endPoint, authorization}) {
     this._endPoint = endPoint;
     this._authorization = authorization;

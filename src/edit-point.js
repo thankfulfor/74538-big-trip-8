@@ -9,7 +9,6 @@ export class EditPoint extends Component {
   constructor(data) {
     super();
     this._id = data.id;
-    this._title = data.title;
     this._icon = events[data.title].icon;
     this._activity = events[data.title].activity;
     this._city = data.city;
@@ -44,7 +43,6 @@ export class EditPoint extends Component {
     this._offers = data.offers;
     this._price = data.price;
     this._time = data.time;
-    this._title = data.title;
     this._isFavorite = data.isFavorite;
   }
 

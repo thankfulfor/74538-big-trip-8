@@ -5,14 +5,12 @@ import moment from 'moment';
 export class Point extends Component {
   constructor(data) {
     super();
-    this._title = data.title;
     this._icon = events[data.title].icon;
     this._activity = events[data.title].activity;
     this._city = data.city;
     this._time = data.time;
     this._price = data.price;
     this._offers = data.offers;
-
     this._onEdit = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
@@ -31,7 +29,6 @@ export class Point extends Component {
   }
 
   update(data) {
-    this._title = data.title;
     this._icon = events[data.title].icon;
     this._activity = events[data.title].activity;
     this._city = data.city;

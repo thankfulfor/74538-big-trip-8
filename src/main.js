@@ -5,9 +5,12 @@ import {NewPoint} from './new-point';
 import {Cost} from './cost';
 import {Sort} from './sort';
 import {renderChart} from './render-chart';
-import {API} from './API';
+import {Api} from './api';
 import {events} from './render-events';
 import moment from 'moment';
+
+const AUTHORIZATION = `Basic dXcjhjuhggkjhkkYNz9yZAorrdfmbfgrr=30`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const filters = [
   {
@@ -34,9 +37,7 @@ const addNewEventButton = document.querySelector(`.trip-controls__new-event`);
 const table = document.getElementById(`table`);
 const stats = document.getElementById(`stats`);
 
-const AUTHORIZATION = `Basic dXcjhjuhggkjhkkYNz9yZAorrdfmbfgrr=30`;
-const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
-export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+export const api = new Api({endPoint: END_POINT, authorization: AUTHORIZATION});
 const costComponent = new Cost();
 const sortComponent = new Sort();
 sortersParentElement.appendChild(sortComponent.render());
