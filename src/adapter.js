@@ -31,7 +31,6 @@ export class Adapter {
   }
 
   static parsePoint(data) {
-    console.log(data)
     return new Adapter(data);
   }
 

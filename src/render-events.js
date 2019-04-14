@@ -56,6 +56,13 @@ export const events = {
   }
 };
 
+const notChecked = (event, icon) => {
+  if (events[event].icon === icon && icon !== events[`new`].icon) {
+    return `checked`;
+  }
+  return ``;
+};
+
 const renderGroupElement = (event, icon) => {
   return (
     `<input
@@ -64,7 +71,8 @@ const renderGroupElement = (event, icon) => {
       id="travel-way-${event}"
       name="travelWay"
       value="${event}"
-      ${events[event].icon === icon ? `checked` : ``}>
+      ${notChecked(event, icon)}
+      required>
      <label class="travel-way__select-label" for="travel-way-${event}">${events[event].icon} ${event}</label>`
   );
 };

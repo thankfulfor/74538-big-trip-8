@@ -34,7 +34,7 @@ const addNewEventButton = document.querySelector(`.trip-controls__new-event`);
 const table = document.getElementById(`table`);
 const stats = document.getElementById(`stats`);
 
-const AUTHORIZATION = `Basic dXcjhjuhggkjhkkYNz9yZAorrdfmbfgrr=17`;
+const AUTHORIZATION = `Basic dXcjhjuhggkjhkkYNz9yZAorrdfmbfgrr=30`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const costComponent = new Cost();
@@ -65,6 +65,12 @@ const unblock = (component) => {
   }
 };
 
+const escapeHandler = (openComponent, closeComponent) => {
+  openComponent.render();
+  pointParentElement.replaceChild(openComponent.element, closeComponent.element);
+  closeComponent.unrender();
+};
+
 const renderPoint = function (data) {
   const pointComponent = new Point(data);
   const editPointComponent = new EditPoint(data);
@@ -87,9 +93,7 @@ const renderPoint = function (data) {
   };
 
   editPointComponent.onEscape = () => {
-    pointComponent.render();
-    pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
-    editPointComponent.unrender();
+    escapeHandler(pointComponent, editPointComponent);
   };
 
   editPointComponent.onSubmit = (newObject) => {
@@ -142,26 +146,22 @@ const renderPoint = function (data) {
   };
 };
 
-export const getMaxId = () => {
-  let acc = 0;
-  allEvents.forEach((event) => {
-    acc = parseInt(event.id, 10) > acc ? parseInt(event.id, 10) : acc;
-  });
-  // для создания новой карточки нужен новый id, не совпадающий с текущими
-  return acc + 1;
-};
-
 const showPoints = function (points) {
   for (let i = 0; i < points.length; i++) {
     renderPoint(points[i]);
   }
 };
 
-const addNewEventListener = () => {
+const addNewEvent = () => {
   addNewEventButton.addEventListener(`click`, function () {
     const newPointComponent = new NewPoint();
     const element = newPointComponent.render();
     pointParentElement.insertAdjacentElement(`afterbegin`, element);
+
+    newPointComponent.onEscape = () => {
+      pointParentElement.removeChild(newPointComponent.element);
+      newPointComponent.unrender();
+    };
 
     newPointComponent.onSubmit = (newData) => {
       costComponent.totalPrice(allEvents);
@@ -173,7 +173,7 @@ const addNewEventListener = () => {
       api.addPoint(newData.toRAW())
         .then(() => {
           unblock(newPointComponent);
-          console.log(newPointComponent)
+          pointParentElement.removeChild(newPointComponent.element);
           newPointComponent.unrender();
         })
         .then(() => api.getPoints())
@@ -386,7 +386,7 @@ pointsList
     showPoints(points);
     allEvents = points;
     costComponent.totalPrice(points);
-    addNewEventListener();
+    addNewEvent();
     totalPriceParentElement.appendChild(costComponent.render());
   })
   .catch(() => {

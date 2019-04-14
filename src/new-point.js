@@ -2,13 +2,13 @@ import {Component} from './component';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 import {renderEvents, events} from './render-events';
-import {destinations, getMaxId} from './main';
-import { Adapter } from './adapter'
+import {destinations} from './main';
+import {Adapter} from './adapter';
 
 export class NewPoint extends Component {
   constructor() {
     super();
-    this._id = getMaxId();
+    this._id = ``;
     this._title = `new`;
     this._icon = events[this._title].icon;
     this._activity = events[this._title].activity;
@@ -88,13 +88,35 @@ export class NewPoint extends Component {
 
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
-    evt.target.innerText = `Saving...`;
-    const formData = new FormData(this._element.querySelector(`.point__form`));
-    const newData = this._processForm(formData);
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit(newData);
+
+    let inputs = [];
+
+    const checkFormValidity = () => {
+      const travelInputsElements = document.getElementsByName(`travelWay`);
+      function isChecked(radio) {
+        return radio.checked;
+      }
+
+      inputs.push([...travelInputsElements].some(isChecked));
+      inputs.push(document.querySelector(`.point__destination-input`).checkValidity());
+      inputs.push(document.getElementsByName(`dateStart`)[0].checkValidity());
+      inputs.push(document.getElementsByName(`dateEnd`)[0].checkValidity());
+      inputs.push(document.querySelector(`.point__price .point__input`).checkValidity());
+
+      return inputs.every((input) => input);
+    };
+
+    if (checkFormValidity()) {
+      evt.target.innerText = `Saving...`;
+      const formData = new FormData(this._element.querySelector(`.point__form`));
+      const newData = this._processForm(formData);
+      if (typeof this._onSubmit === `function`) {
+        this._onSubmit(newData);
+      }
+      this.update(newData);
+    } else {
+      this.shake();
     }
-    this.update(newData);
   }
 
   set onEscape(fn) {
@@ -213,7 +235,6 @@ export class NewPoint extends Component {
       this._element.style.animation = ``;
       this._element.style.border = `none`;
     }, ANIMATION_TIMEOUT);
-
   }
 
   bind() {
