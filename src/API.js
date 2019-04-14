@@ -31,6 +31,16 @@ export const API = class {
       .then(Adapter.parsePoints);
   }
 
+  addPoint(point) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(point),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON);
+  }
+
   updatePoints({id, data}) {
     return this._load({
       url: `points/${id}`,

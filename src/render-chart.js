@@ -1,17 +1,20 @@
-import Chart from 'chart';
+import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getPrices, getTransportWays} from './main';
+import {getPrices, getTransportWays, getTimeSpentChartData} from './main';
 
 let moneyChart = {};
 let transportChart = {};
+let timeSpendChart = {};
 
 export const renderChart = () => {
   const moneyCtx = document.querySelector(`.statistic__money`);
   const transportCtx = document.querySelector(`.statistic__transport`);
+  const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
 
   const BAR_HEIGHT = 55;
   moneyCtx.height = BAR_HEIGHT * 6;
   transportCtx.height = BAR_HEIGHT * 4;
+  timeSpendCtx.height = BAR_HEIGHT * 14;
 
   const clearChart = () => {
     if (typeof moneyChart.destroy === `function`) {
@@ -19,6 +22,9 @@ export const renderChart = () => {
     }
     if (typeof transportChart.destroy === `function`) {
       transportChart.destroy();
+    }
+    if (typeof timeSpendChart.destroy === `function`) {
+      timeSpendChart.destroy();
     }
   };
 
@@ -132,6 +138,63 @@ export const renderChart = () => {
             drawBorder: false
           },
           barThickness: 44,
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          minBarLength: 50
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false,
+      }
+    }
+  });
+
+  timeSpendChart = new Chart(timeSpendCtx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: getTimeSpentChartData(),
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13
+          },
+          color: `#000000`,
+          anchor: `end`,
+          align: `start`,
+          formatter: (val) => `${val}H`
+        }
+      },
+      title: {
+        display: true,
+        text: `TIME SPENT`,
+        fontColor: `#000000`,
+        fontSize: 23,
+        position: `left`
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#000000`,
+            padding: 5,
+            fontSize: 13,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 44
         }],
         xAxes: [{
           ticks: {

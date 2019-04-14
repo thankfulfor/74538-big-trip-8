@@ -5,6 +5,18 @@ export class Sort extends Component {
   constructor() {
     super();
     this._showFilters = showFilters;
+    this._onSort = null;
+    this._sortClick = this._sortClick.bind(this);
+  }
+
+  set onSort(fn) {
+    this._onSort = fn;
+  }
+
+  _sortClick(evt) {
+    if (typeof this._onSort === `function`) {
+      this._onSort(evt.target.innerText.trim());
+    }
   }
 
   get template() {
@@ -36,7 +48,14 @@ export class Sort extends Component {
     return this._element;
   }
 
-  bind() {}
+  bind() {
+    const sortDefaultElement = this._element.querySelector(`.trip-sorting__item--event`);
+    const sortByTimeElement = this._element.querySelector(`.trip-sorting__item--time`);
+    const sortByPriceElement = this._element.querySelector(`.trip-sorting__item--price`);
+    sortDefaultElement.addEventListener(`click`, this._sortClick);
+    sortByTimeElement.addEventListener(`click`, this._sortClick);
+    sortByPriceElement.addEventListener(`click`, this._sortClick);
+  }
 
   unbind() {}
 }

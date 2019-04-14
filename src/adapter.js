@@ -15,20 +15,23 @@ export class Adapter {
 
   toRAW() {
     return {
+      'destination': {
+        name: this.city,
+        description: this.description,
+        pictures: this.pictures,
+      },
       'id': this.id,
-      'type': this.title,
+      'is_favorite': this.isFavorite,
+      'offers': this.offers,
+      'base_price': this.price,
       'date_from': this.time.startTime,
       'date_to': this.time.endTime,
-      'destination.name': this.city,
-      'destination.description': this.description,
-      'destination.pictures': this.pictures,
-      'is_favorite': this.isFavorite,
-      'base_price': this.price,
-      'offers': this.offers,
+      'type': this.title,
     };
   }
 
   static parsePoint(data) {
+    console.log(data)
     return new Adapter(data);
   }
 

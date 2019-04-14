@@ -1,10 +1,13 @@
 import {showFilters} from './render-filter';
 import {Point} from './point';
 import {EditPoint} from './edit-point';
+import {NewPoint} from './new-point';
 import {Cost} from './cost';
 import {Sort} from './sort';
 import {renderChart} from './render-chart';
 import {API} from './API';
+import {events} from './render-events';
+import moment from 'moment';
 
 const filters = [
   {
@@ -27,39 +30,45 @@ const totalPriceParentElement = document.querySelector(`.trip__total-cost`);
 const sortersParentElement = document.querySelector(`.trip-sorting`);
 const showPointsButton = document.querySelector(`.view-switch__item--table`);
 const showStatsButton = document.querySelector(`.view-switch__item--stats`);
+const addNewEventButton = document.querySelector(`.trip-controls__new-event`);
 const table = document.getElementById(`table`);
 const stats = document.getElementById(`stats`);
 
-const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAorrdfmbfgrr=`;
+const AUTHORIZATION = `Basic dXcjhjuhggkjhkkYNz9yZAorrdfmbfgrr=17`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const costComponent = new Cost();
 const sortComponent = new Sort();
 sortersParentElement.appendChild(sortComponent.render());
-
+const destinationsList = api.getDestinations();
 export let destinations = [];
 export let offers = [];
+
+destinationsList
+  .then((value) => {
+    destinations = value;
+  });
+
+const block = (component) => {
+  const form = component.element.querySelector(`.point__form`);
+  const elements = form.elements;
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].readOnly = true;
+  }
+};
+
+const unblock = (component) => {
+  const form = component.element.querySelector(`.point__form`);
+  const elements = form.elements;
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].readOnly = false;
+  }
+};
 
 const renderPoint = function (data) {
   const pointComponent = new Point(data);
   const editPointComponent = new EditPoint(data);
   pointParentElement.appendChild(pointComponent.render());
-
-  const block = () => {
-    const form = editPointComponent.element.querySelector(`.point__form`);
-    const elements = form.elements;
-    for (let i = 0; i < elements.length; i++) {
-      elements[i].readOnly = true;
-    }
-  };
-
-  const unblock = () => {
-    const form = editPointComponent.element.querySelector(`.point__form`);
-    const elements = form.elements;
-    for (let i = 0; i < elements.length; i++) {
-      elements[i].readOnly = false;
-    }
-  };
 
   const replaceComponents = () => {
     editPointComponent.render();
@@ -68,18 +77,12 @@ const renderPoint = function (data) {
   };
 
   pointComponent.onEdit = () => {
-    const destinationsList = api.getDestinations();
     const offersList = api.getOffers();
-    destinationsList
+
+    offersList
       .then((value) => {
-        destinations = value;
+        offers = value;
       })
-      .then(
-          offersList
-        .then((value) => {
-          offers = value;
-        })
-      )
       .then(replaceComponents);
   };
 
@@ -97,41 +100,55 @@ const renderPoint = function (data) {
     data.price = newObject.price;
     data.offers = newObject.offers;
     data.title = newObject.title;
-
+    data.isFavorite = newObject.isFavorite;
     costComponent.totalPrice(allEvents);
     costComponent.unrender();
     totalPriceParentElement.innerHTML = ``;
     totalPriceParentElement.appendChild(costComponent.render());
 
-    block();
+    block(editPointComponent);
 
     api.updatePoints({id: data.id, data: data.toRAW()})
       .then((newPoint) => {
-        unblock();
+        unblock(editPointComponent);
         pointComponent.update(newPoint);
         pointComponent.render();
         pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
         editPointComponent.unrender();
       })
+      .then(() => api.getPoints())
+      .then((points) => {
+        allEvents = points;
+      })
       .catch(() => {
         editPointComponent.shake();
-        unblock();
+        unblock(editPointComponent);
       });
   };
 
   editPointComponent.onDelete = ({id}) => {
-    block();
+    block(editPointComponent);
     api.deleteTask({id})
       .then(() => api.getPoints())
-      .then(() => {
+      .then((points) => {
+        allEvents = points;
         pointParentElement.removeChild(editPointComponent.element);
         editPointComponent.unrender();
       })
       .catch(() => {
         editPointComponent.shake();
-        unblock();
+        unblock(editPointComponent);
       });
   };
+};
+
+export const getMaxId = () => {
+  let acc = 0;
+  allEvents.forEach((event) => {
+    acc = parseInt(event.id, 10) > acc ? parseInt(event.id, 10) : acc;
+  });
+  // для создания новой карточки нужен новый id, не совпадающий с текущими
+  return acc + 1;
 };
 
 const showPoints = function (points) {
@@ -140,16 +157,47 @@ const showPoints = function (points) {
   }
 };
 
-const filterEvents = (events, filterName) => {
+const addNewEventListener = () => {
+  addNewEventButton.addEventListener(`click`, function () {
+    const newPointComponent = new NewPoint();
+    const element = newPointComponent.render();
+    pointParentElement.insertAdjacentElement(`afterbegin`, element);
+
+    newPointComponent.onSubmit = (newData) => {
+      costComponent.totalPrice(allEvents);
+      costComponent.unrender();
+      totalPriceParentElement.innerHTML = ``;
+      totalPriceParentElement.appendChild(costComponent.render());
+      block(newPointComponent);
+
+      api.addPoint(newData.toRAW())
+        .then(() => {
+          unblock(newPointComponent);
+          console.log(newPointComponent)
+          newPointComponent.unrender();
+        })
+        .then(() => api.getPoints())
+        .then((newPoint) => {
+          allEvents = newPoint;
+        })
+        .catch(() => {
+          newPointComponent.shake();
+          unblock(newPointComponent);
+        });
+    };
+  });
+};
+
+const filterEvents = (points, filterName) => {
   switch (filterName) {
     default:
-      return events;
+      return points;
 
     case `filter-future`:
-      return events.filter((it) => it.time.startTime < Date.now());
+      return points.filter((it) => it.time.startTime < Date.now());
 
     case `filter-past`:
-      return events.filter((it) => it.time.startTime > Date.now());
+      return points.filter((it) => it.time.startTime > Date.now());
   }
 };
 
@@ -252,6 +300,26 @@ export const getTransportWays = () => {
   return [driveCount, rideCount, flightCount, sailCount];
 };
 
+export const getTimeSpentChartData = () => {
+  const objectData = {
+    labels: [],
+    datasets: [{
+      data: [],
+      backgroundColor: `#ffffff`,
+      hoverBackgroundColor: `#ffffff`,
+      anchor: `start`
+    }]
+  };
+
+  const getLabelAndData = (event) => {
+    objectData.labels.push(events[event.title].icon + ` ` + events[event.title].activity + event.city);
+    objectData.datasets[0].data.push(Math.ceil(moment(event.time.endTime).diff(moment(event.time.startTime), `hours`, true)));
+  };
+
+  allEvents.forEach(getLabelAndData);
+  return objectData;
+};
+
 const pointsList = api.getPoints();
 
 const showPreloadMessage = (text) => {
@@ -270,12 +338,55 @@ let allEvents = [];
 
 showPreloadMessage(loadText);
 
+sortComponent.onSort = (eventTarget) => {
+
+  if (eventTarget === `EVENT`) {
+    pointParentElement.innerHTML = ``;
+    showPoints(allEvents);
+  }
+
+  if (eventTarget === `TIME`) {
+    let eventsSortedByTime = [];
+    const sortByTime = (eventsArray) => {
+      // копируем массив allEvents не по ссылке, а по значению.
+      eventsSortedByTime = eventsArray.slice();
+      const compareTime = (a, b) => {
+        const durationOfA = a.time.startTime - a.time.endTime;
+        const durationOfB = b.time.startTime - b.time.endTime;
+        return durationOfA > durationOfB ? 1 : -1;
+      };
+
+      eventsSortedByTime = eventsSortedByTime.sort(compareTime);
+      return eventsSortedByTime;
+    };
+    pointParentElement.innerHTML = ``;
+    showPoints(sortByTime(allEvents));
+  }
+
+  if (eventTarget === `PRICE`) {
+    let eventsSortedByPrice = [];
+    const sortByPrice = (eventsArray) => {
+      // копируем массив allEvents не по ссылке, а по значению.
+      eventsSortedByPrice = eventsArray.slice();
+      const compareTime = (a, b) => {
+        return b.price > a.price ? 1 : -1;
+      };
+
+      eventsSortedByPrice = eventsSortedByPrice.sort(compareTime);
+      return eventsSortedByPrice;
+    };
+    pointParentElement.innerHTML = ``;
+    showPoints(sortByPrice(allEvents));
+  }
+};
+
 pointsList
   .then((points) => {
     hidePreloadMessage();
     showPoints(points);
     allEvents = points;
     costComponent.totalPrice(points);
+    addNewEventListener();
     totalPriceParentElement.appendChild(costComponent.render());
   })
   .catch(() => {

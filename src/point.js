@@ -41,8 +41,17 @@ export class Point extends Component {
   }
 
   get template() {
-    const durationAsHours = Math.floor(moment(this._time.endTime).diff(moment(this._time.startTime), `hours`, true));
-    const durationAsMinutes = moment(moment(this._time.endTime).diff(moment(this._time.startTime))).format(`mm`);
+    const diff = moment(this._time.endTime).diff(moment(this._time.startTime));
+    const duration = moment.duration(diff);
+    let formattedDifference = ``;
+    if (Math.floor(duration.asDays()) > 0) {
+      formattedDifference = Math.floor(duration.asDays()) + moment.utc(diff).format(`[D] HH[H] mm[M]`);
+    } else if (Math.floor(duration.asMinutes()) < 60) {
+      formattedDifference = moment.utc(diff).format(`mm[M]`);
+    } else {
+      formattedDifference = moment.utc(diff).format(`HH[H] mm[M]`);
+    }
+
     return (
       `<article class="trip-point">
         <i class="trip-icon">${this._icon}</i>
@@ -50,7 +59,7 @@ export class Point extends Component {
         <p class="trip-point__schedule">
           <span class="trip-point__timetable">${moment(this._time.startTime).format(`HH:mm`)} – ${moment(this._time.endTime).format(`HH:mm`)}</span>
           
-            <span class="trip-point__duration">${durationAsHours}:${durationAsMinutes}</span>
+            <span class="trip-point__duration">${formattedDifference}</span>
             </p>
             <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
         <ul class="trip-point__offers">

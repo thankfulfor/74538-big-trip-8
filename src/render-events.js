@@ -48,6 +48,11 @@ export const events = {
     activity: `Transport to `,
     icon: `🚊`,
     isTransport: true,
+  },
+  'new': {
+    activity: `<-- Click in a circle to choose an activity>`,
+    icon: `🛴`,
+    isTransport: false,
   }
 };
 
