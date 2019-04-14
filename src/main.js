@@ -174,12 +174,11 @@ const addNewEvent = () => {
       api.addPoint(newData.toRAW())
         .then(() => {
           unblock(newPointComponent);
-          pointParentElement.removeChild(newPointComponent.element);
-          newPointComponent.unrender();
         })
         .then(() => api.getPoints())
-        .then((newPoint) => {
-          allEvents = newPoint;
+        .then((newPoints) => {
+          pointParentElement.innerHTML = ``;
+          showPoints(newPoints);
         })
         .catch(() => {
           newPointComponent.shake();
