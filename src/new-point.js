@@ -27,10 +27,10 @@ export class NewPoint extends Component {
 
   renderOptions(destinationsListItem) {
     const names = destinationsListItem.map((item) => item.name);
-    const optionsList = names.map((name) => {
+    const options = names.map((name) => {
       return `<option value="${name}"></option>`;
     });
-    return optionsList.join(``);
+    return options.join(``);
   }
 
   update(data) {
@@ -92,15 +92,15 @@ export class NewPoint extends Component {
     let inputs = [];
 
     const checkFormValidity = () => {
-      const travelInputsElements = document.getElementsByName(`travelWay`);
+      const travelInputsElements = document.querySelectorAll(`.travel-way__select-input`);
       function isChecked(radio) {
         return radio.checked;
       }
 
       inputs.push([...travelInputsElements].some(isChecked));
       inputs.push(document.querySelector(`.point__destination-input`).checkValidity());
-      inputs.push(document.getElementsByName(`dateStart`)[0].checkValidity());
-      inputs.push(document.getElementsByName(`dateEnd`)[0].checkValidity());
+      inputs.push(document.querySelector(`input[name='dateStart']`).checkValidity());
+      inputs.push(document.querySelector(`input[name='dateEnd']`).checkValidity());
       inputs.push(document.querySelector(`.point__price .point__input`).checkValidity());
 
       return inputs.every((input) => input);
@@ -170,18 +170,18 @@ export class NewPoint extends Component {
               <input
                   class="point__input"
                   type="text"
-                  value="${this._time.startTime}"
+                  value=""
                   name="dateStart"
-                  placeholder="3:20"
+                  placeholder=""
                   required
               />
               <span class="point__input point__input--separator">–</span>
               <input
                   class="point__input"
                   type="text"
-                  value="${this._time.endTime}"
+                  value=""
                   name="dateEnd"
-                  placeholder="7:40"
+                  placeholder=""
                   required
               />
             </div>
@@ -227,13 +227,11 @@ export class NewPoint extends Component {
 
   shake() {
     const ANIMATION_TIMEOUT = 600;
-    this._element.style.border = `1px solid red`;
-    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+    this._element.classList.add(`error-animation`);
     this._element.querySelector(`.point__button--save`).innerText = `Save`;
 
     setTimeout(() => {
-      this._element.style.animation = ``;
-      this._element.style.border = `none`;
+      this._element.classList.remove(`error-animation`);
     }, ANIMATION_TIMEOUT);
   }
 
@@ -244,7 +242,7 @@ export class NewPoint extends Component {
     const endInputTimeElement = this._element.querySelector(`input[name='dateEnd']`);
 
     flatpickr(startInputTimeElement, {
-      'defaultDate': `0`,
+      'defaultDate': new Date(),
       'enableTime': true,
       'time_24hr': true,
       'altInput': true,
@@ -253,7 +251,7 @@ export class NewPoint extends Component {
     });
 
     flatpickr(endInputTimeElement, {
-      'defaultDate': `0`,
+      'defaultDate': new Date(),
       'enableTime': true,
       'time_24hr': true,
       'altInput': true,

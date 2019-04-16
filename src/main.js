@@ -34,10 +34,10 @@ const sortersParentElement = document.querySelector(`.trip-sorting`);
 const showPointsButton = document.querySelector(`.view-switch__item--table`);
 const showStatsButton = document.querySelector(`.view-switch__item--stats`);
 const addNewEventButton = document.querySelector(`.trip-controls__new-event`);
-const table = document.getElementById(`table`);
-const stats = document.getElementById(`stats`);
+const table = document.querySelector(`#table`);
+const stats = document.querySelector(`#stats`);
 
-export const api = new Api({endPoint: END_POINT, authorization: AUTHORIZATION});
+const api = new Api({endPoint: END_POINT, authorization: AUTHORIZATION});
 const costComponent = new Cost();
 const sortComponent = new Sort();
 sortersParentElement.appendChild(sortComponent.render());
@@ -50,20 +50,10 @@ destinationsList
     destinations = value;
   });
 
-const block = (component) => {
+const toggleReadonly = (component, isReadOnly) => {
   const form = component.element.querySelector(`.point__form`);
   const elements = form.elements;
-  for (let i = 0; i < elements.length; i++) {
-    elements[i].readOnly = true;
-  }
-};
-
-const unblock = (component) => {
-  const form = component.element.querySelector(`.point__form`);
-  const elements = form.elements;
-  for (let i = 0; i < elements.length; i++) {
-    elements[i].readOnly = false;
-  }
+  elements.forEach((element) => (element.readOnly = isReadOnly));
 };
 
 const escapeHandler = (openComponent, closeComponent) => {
@@ -111,11 +101,11 @@ const renderPoint = function (data) {
     totalPriceParentElement.innerHTML = ``;
     totalPriceParentElement.appendChild(costComponent.render());
 
-    block(editPointComponent);
+    toggleReadonly(editPointComponent, true);
 
     api.updatePoints({id: data.id, data: data.toRAW()})
       .then((newPoint) => {
-        unblock(editPointComponent);
+        toggleReadonly(editPointComponent, false);
         pointComponent.update(newPoint);
         pointComponent.render();
         pointParentElement.replaceChild(pointComponent.element, editPointComponent.element);
@@ -127,12 +117,13 @@ const renderPoint = function (data) {
       })
       .catch(() => {
         editPointComponent.shake();
-        unblock(editPointComponent);
+        toggleReadonly(editPointComponent, false);
       });
   };
 
   editPointComponent.onDelete = ({id}) => {
-    block(editPointComponent);
+    toggleReadonly(editPointComponent, true);
+
     api.deleteTask({id})
       .then(() => api.getPoints())
       .then((points) => {
@@ -142,7 +133,7 @@ const renderPoint = function (data) {
       })
       .catch(() => {
         editPointComponent.shake();
-        unblock(editPointComponent);
+        toggleReadonly(editPointComponent, false);
       });
   };
 };
@@ -169,11 +160,11 @@ const addNewEvent = () => {
       costComponent.unrender();
       totalPriceParentElement.innerHTML = ``;
       totalPriceParentElement.appendChild(costComponent.render());
-      block(newPointComponent);
+      toggleReadonly(newPointComponent, true);
 
       api.addPoint(newData.toRAW())
         .then(() => {
-          unblock(newPointComponent);
+          toggleReadonly(newPointComponent, false);
         })
         .then(() => api.getPoints())
         .then((newPoints) => {
@@ -182,7 +173,7 @@ const addNewEvent = () => {
         })
         .catch(() => {
           newPointComponent.shake();
-          unblock(newPointComponent);
+          toggleReadonly(newPointComponent, false);
         });
     };
   });
@@ -201,13 +192,13 @@ const filterEvents = (points, filterName) => {
   }
 };
 
-filtersParentElement.onchange = (evt) => {
+filtersParentElement.addEventListener(`change`, (evt) => {
   const filterName = evt.target.id;
   filteredEvents = filterEvents(allEvents, filterName);
   pointParentElement.innerHTML = ``;
   showPoints(filteredEvents);
   renderChart();
-};
+});
 
 showStatsButton.addEventListener(`click`, function () {
   showStatsButton.classList.add(`view-switch__item--active`);

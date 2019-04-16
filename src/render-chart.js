@@ -2,6 +2,11 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getPrices, getTransportWays, getTimeSpentChartData} from './main';
 
+const BAR_HEIGHT = 55;
+const MONEY_BAR_HEIGHT = 6;
+const TRANSPORT_BAR_HEIGHT = 4;
+const TIME_SPEND_BAR_HEIGHT = 14;
+
 let moneyChart = {};
 let transportChart = {};
 let timeSpendChart = {};
@@ -11,10 +16,9 @@ export const renderChart = () => {
   const transportCtx = document.querySelector(`.statistic__transport`);
   const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
 
-  const BAR_HEIGHT = 55;
-  moneyCtx.height = BAR_HEIGHT * 6;
-  transportCtx.height = BAR_HEIGHT * 4;
-  timeSpendCtx.height = BAR_HEIGHT * 14;
+  moneyCtx.height = BAR_HEIGHT * MONEY_BAR_HEIGHT;
+  transportCtx.height = BAR_HEIGHT * TRANSPORT_BAR_HEIGHT;
+  timeSpendCtx.height = BAR_HEIGHT * TIME_SPEND_BAR_HEIGHT;
 
   const clearChart = () => {
     if (typeof moneyChart.destroy === `function`) {

@@ -120,10 +120,8 @@ export class EditPoint extends Component {
   }
 
   _onEscapePress(evt) {
-    if (evt.keyCode === 27) {
-      if (typeof this._onEscape === `function`) {
-        this._onEscape();
-      }
+    if (evt.keyCode === 27 && typeof this._onEscape === `function`) {
+      this._onEscape();
     }
   }
 
@@ -239,14 +237,12 @@ ${this._renderOffers(this._offers)}
 
   shake() {
     const ANIMATION_TIMEOUT = 600;
-    this._element.style.border = `1px solid red`;
-    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+    this._element.classList.add(`error-animation`);
     this._element.querySelector(`.point__button--save`).innerText = `Save`;
     this._element.querySelector(`.point__button--delete`).innerText = `Delete`;
 
     setTimeout(() => {
-      this._element.style.animation = ``;
-      this._element.style.border = `none`;
+      this._element.classList.remove(`error-animation`);
     }, ANIMATION_TIMEOUT);
 
   }
@@ -290,7 +286,7 @@ ${this._renderOffers(this._offers)}
     let newOffers = [];
     travelInputsCollection.forEach((travelInput) => {
       travelInput.onclick = () => {
-        travelInput.setAttribute(`checked`, true);
+        travelInput.checked = true;
         document.querySelector(`.travel-way__label`).innerText = events[travelInput.value].icon;
         document.querySelector(`.point__destination-label`).innerText = events[travelInput.value].activity;
         document.querySelector(`.travel-way__toggle`).checked = false;
@@ -312,7 +308,8 @@ ${this._renderOffers(this._offers)}
     const destinationInputElement = this._element.querySelector(`.point__destination-input`);
     const destinationTextElement = this._element.querySelector(`.point__destination-text`);
     const destinationImageElements = this._element.querySelector(`.point__destination-images`);
-    destinationInputElement.onchange = () => {
+
+    const onDestinationInputElementClick = () => {
       let description = ``;
       let photos = [];
       destinations.some(function (destination) {
@@ -326,6 +323,7 @@ ${this._renderOffers(this._offers)}
       this.updateDesription(photos, description);
     };
 
+    destinationInputElement.addEventListener(`change`, onDestinationInputElementClick);
     document.addEventListener(`keydown`, this._onEscapePress);
   }
 
