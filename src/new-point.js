@@ -225,7 +225,7 @@ export class NewPoint extends Component {
 
     travelInputsCollection.forEach((travelInput) => {
       travelInput.onclick = () => {
-        travelInput.setAttribute(`checked`, true);
+        travelInput.checked = true;
         document.querySelector(`.travel-way__label`).innerText = events[travelInput.value].icon;
         document.querySelector(`.point__destination-label`).innerText = events[travelInput.value].activity;
         document.querySelector(`.travel-way__toggle`).checked = false;
