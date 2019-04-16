@@ -25,6 +25,10 @@ export class NewPoint extends Component {
     this._onEscapePress = this._onEscapePress.bind(this);
   }
 
+  get saveButton() {
+    return this._element.querySelector(`.point__button--save`);
+  }
+
   renderOptions(destinationsListItem) {
     const names = destinationsListItem.map((item) => item.name);
     const options = names.map((name) => {
@@ -209,7 +213,7 @@ export class NewPoint extends Component {
   shake() {
     const ANIMATION_TIMEOUT = 600;
     this._element.classList.add(`error-animation`);
-    this._element.querySelector(`.point__button--save`).innerText = `Save`;
+    this.saveButton.innerText = `Save`;
 
     setTimeout(() => {
       this._element.classList.remove(`error-animation`);
@@ -217,7 +221,7 @@ export class NewPoint extends Component {
   }
 
   bind() {
-    this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitButtonClick);
+    this.saveButton.addEventListener(`click`, this._onSubmitButtonClick);
 
     triggerFlatpickr(this._element, new Date(), new Date());
 
@@ -253,8 +257,7 @@ export class NewPoint extends Component {
   }
 
   unbind() {
-    this._element.querySelector(`.point__button--save`)
-      .removeEventListener(`click`, this._onSubmitButtonClick);
+    this.saveButton.removeEventListener(`click`, this._onSubmitButtonClick);
 
     document.removeEventListener(`keydown`, this._onEscapePress);
   }

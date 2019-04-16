@@ -28,6 +28,14 @@ export class EditPoint extends Component {
     this._onEscapePress = this._onEscapePress.bind(this);
   }
 
+  get saveButton() {
+    return this._element.querySelector(`.point__button--save`);
+  }
+
+  get deleteButton() {
+    return this._element.querySelector(`.point__button--delete`);
+  }
+
   renderOptions(destinationsListItem) {
     const names = destinationsListItem.map((item) => item.name);
     const optionsList = names.map((name) => {
@@ -181,7 +189,7 @@ export class EditPoint extends Component {
               <section class="point__offers">
                 <h3 class="point__details-title">offers</h3>
                 <div class="point__offers-wrap">
-${this._renderOffers(this._offers)}
+                  ${this._renderOffers(this._offers)}
               </div>
             </section>
             
@@ -214,15 +222,15 @@ ${this._renderOffers(this._offers)}
   _onDeleteButtonClick() {
     if (typeof this._onDelete === `function`) {
       this._onDelete({id: this._id});
-      this._element.querySelector(`.point__button--delete`).innerText = `Deleting...`;
+      this._deleteButton.innerText = `Deleting...`;
     }
   }
 
   shake() {
     const ANIMATION_TIMEOUT = 600;
     this._element.classList.add(`error-animation`);
-    this._element.querySelector(`.point__button--save`).innerText = `Save`;
-    this._element.querySelector(`.point__button--delete`).innerText = `Delete`;
+    this.saveButton.innerText = `Save`;
+    this.deleteButton.innerText = `Delete`;
 
     setTimeout(() => {
       this._element.classList.remove(`error-animation`);
@@ -231,8 +239,8 @@ ${this._renderOffers(this._offers)}
   }
 
   bind() {
-    this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitButtonClick);
-    this._element.querySelector(`.point__button--delete`).addEventListener(`click`, this._onDeleteButtonClick);
+    this.saveButton.addEventListener(`click`, this._onSubmitButtonClick);
+    this.deleteButton.addEventListener(`click`, this._onDeleteButtonClick);
 
     triggerFlatpickr(this._element, this._time.startTime, this._time.endTime);
 
@@ -292,11 +300,8 @@ ${this._renderOffers(this._offers)}
   }
 
   unbind() {
-    this._element.querySelector(`.point__button--save`)
-      .removeEventListener(`click`, this._onSubmitButtonClick);
-
-    this._element.querySelector(`.point__button--delete`)
-      .removeEventListener(`click`, this._onDeleteButtonClick);
+    this.saveButton.removeEventListener(`click`, this._onSubmitButtonClick);
+    this.deleteButton.removeEventListener(`click`, this._onDeleteButtonClick);
 
     document.removeEventListener(`keydown`, this._onEscapePress);
   }
