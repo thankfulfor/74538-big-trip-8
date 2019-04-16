@@ -1,9 +1,9 @@
 import {Component} from './component';
-import flatpickr from 'flatpickr';
 import moment from 'moment';
 import {renderEvents, events} from './render-events';
 import {renderOffers} from './render-offers';
 import {destinations, offers} from './main';
+import {triggerFlatpickr, renderTimeInputs} from './get-date-picker';
 
 export class EditPoint extends Component {
   constructor(data) {
@@ -156,25 +156,8 @@ export class EditPoint extends Component {
                 ${this.renderOptions(destinations)}
               </datalist>
             </div>
-      
-            <div class="point__time">
-              choose time
-              <input
-                  class="point__input"
-                  type="text"
-                  value="${this._time.startTime}"
-                  name="dateStart"
-                  placeholder="${this._time.startTime}"
-              />
-              <span class="point__input point__input--separator">–</span>
-              <input
-                  class="point__input"
-                  type="text"
-                  value="${this._time.endTime}"
-                  name="dateEnd"
-                  placeholder="${this._time.endTime}"
-              />
-            </div>
+            
+            ${renderTimeInputs(this._time.startTime, this._time.endTime)}
       
             <label class="point__price">
               write price
@@ -251,26 +234,7 @@ ${this._renderOffers(this._offers)}
     this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitButtonClick);
     this._element.querySelector(`.point__button--delete`).addEventListener(`click`, this._onDeleteButtonClick);
 
-    const startInputTimeElement = this._element.querySelector(`input[name='dateStart']`);
-    const endInputTimeElement = this._element.querySelector(`input[name='dateEnd']`);
-
-    flatpickr(startInputTimeElement, {
-      'defaultDate': this._time.startTime,
-      'enableTime': true,
-      'time_24hr': true,
-      'altInput': true,
-      'altFormat': `H:i`,
-      'dateFormat': `Z`
-    });
-
-    flatpickr(endInputTimeElement, {
-      'defaultDate': this._time.endTime,
-      'enableTime': true,
-      'time_24hr': true,
-      'altInput': true,
-      'altFormat': `H:i`,
-      'dateFormat': `Z`
-    });
+    triggerFlatpickr(this._element, this._time.startTime, this._time.endTime);
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
     const offersWrapElement = this._element.querySelector(`.point__offers-wrap`);

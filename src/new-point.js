@@ -1,9 +1,9 @@
 import {Component} from './component';
-import flatpickr from 'flatpickr';
 import moment from 'moment';
 import {renderEvents, events} from './render-events';
 import {destinations} from './main';
 import {Adapter} from './adapter';
+import {triggerFlatpickr, renderTimeInputs} from './get-date-picker';
 
 export class NewPoint extends Component {
   constructor() {
@@ -165,26 +165,7 @@ export class NewPoint extends Component {
               </datalist>
             </div>
       
-            <div class="point__time">
-              choose time
-              <input
-                  class="point__input"
-                  type="text"
-                  value=""
-                  name="dateStart"
-                  placeholder=""
-                  required
-              />
-              <span class="point__input point__input--separator">–</span>
-              <input
-                  class="point__input"
-                  type="text"
-                  value=""
-                  name="dateEnd"
-                  placeholder=""
-                  required
-              />
-            </div>
+            ${renderTimeInputs(new Date(), new Date())}
       
             <label class="point__price">
               write price
@@ -238,26 +219,7 @@ export class NewPoint extends Component {
   bind() {
     this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitButtonClick);
 
-    const startInputTimeElement = this._element.querySelector(`input[name='dateStart']`);
-    const endInputTimeElement = this._element.querySelector(`input[name='dateEnd']`);
-
-    flatpickr(startInputTimeElement, {
-      'defaultDate': new Date(),
-      'enableTime': true,
-      'time_24hr': true,
-      'altInput': true,
-      'altFormat': `H:i`,
-      'dateFormat': `Z`
-    });
-
-    flatpickr(endInputTimeElement, {
-      'defaultDate': new Date(),
-      'enableTime': true,
-      'time_24hr': true,
-      'altInput': true,
-      'altFormat': `H:i`,
-      'dateFormat': `Z`
-    });
+    triggerFlatpickr(this._element, new Date(), new Date());
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
 
