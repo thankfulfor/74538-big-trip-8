@@ -255,24 +255,27 @@ export class EditPoint extends Component {
       }
     };
 
-    let newOffers = [];
     travelInputsCollection.forEach((travelInput) => {
       travelInput.onclick = () => {
         travelInput.checked = true;
         document.querySelector(`.travel-way__label`).innerText = events[travelInput.value].icon;
         document.querySelector(`.point__destination-label`).innerText = events[travelInput.value].activity;
         document.querySelector(`.travel-way__toggle`).checked = false;
-        offers.some(function (offer) {
+        let newOffers = [];
+        offers.forEach(function (offer) {
+
           if (travelInput.value === offer.type) {
+
             newOffers = offer.offers;
             newOffers.forEach(function (newOffer) {
-              if (newOffer !== null) {
+              if (newOffer !== null && !newOffer.title) {
                 renameObjectField(`name`, `title`, newOffer);
               }
             });
           }
-          offersWrapElement.innerHTML = renderOffers(newOffers);
         });
+        offersWrapElement.innerHTML = ``;
+        offersWrapElement.innerHTML = renderOffers(newOffers);
         this.updateOffers(newOffers);
       };
     });
