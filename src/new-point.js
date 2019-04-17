@@ -239,7 +239,8 @@ export class NewPoint extends Component {
     const destinationInputElement = this._element.querySelector(`.point__destination-input`);
     const destinationTextElement = this._element.querySelector(`.point__destination-text`);
     const destinationImageElements = this._element.querySelector(`.point__destination-images`);
-    destinationInputElement.onchange = () => {
+
+    const onDestinationInputElementClick = () => {
       let description = ``;
       let photos = [];
       destinations.some(function (destination) {
@@ -252,6 +253,8 @@ export class NewPoint extends Component {
       });
       this.updateDesription(photos, description);
     };
+
+    destinationInputElement.addEventListener(`change`, onDestinationInputElementClick);
 
     document.addEventListener(`keydown`, this._onEscapePress);
   }
