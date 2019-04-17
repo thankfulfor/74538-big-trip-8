@@ -53,7 +53,7 @@ destinationsList
 const toggleReadonly = (component, isReadOnly) => {
   const form = component.element.querySelector(`.point__form`);
   const elements = form.elements;
-  elements.forEach((element) => (element.readOnly = isReadOnly));
+  [...elements].forEach((element) => (element.readOnly = isReadOnly));
 };
 
 const escapeHandler = (openComponent, closeComponent) => {
