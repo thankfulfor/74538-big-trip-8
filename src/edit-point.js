@@ -255,29 +255,29 @@ export class EditPoint extends Component {
       }
     };
 
+    const onTravelInputClick = (evt) => {
+      evt.target.checked = true;
+      document.querySelector(`.travel-way__label`).innerText = events[evt.target.value].icon;
+      document.querySelector(`.point__destination-label`).innerText = events[evt.target.value].activity;
+      document.querySelector(`.travel-way__toggle`).checked = false;
+      let newOffers = [];
+      offers.forEach(function (offer) {
+        if (evt.target.value === offer.type) {
+          newOffers = offer.offers;
+          newOffers.forEach(function (newOffer) {
+            if (newOffer !== null && !newOffer.title) {
+              renameObjectField(`name`, `title`, newOffer);
+            }
+          });
+        }
+      });
+      offersWrapElement.innerHTML = ``;
+      offersWrapElement.innerHTML = renderOffers(newOffers);
+      this.updateOffers(newOffers);
+    };
+
     travelInputsCollection.forEach((travelInput) => {
-      travelInput.onclick = () => {
-        travelInput.checked = true;
-        document.querySelector(`.travel-way__label`).innerText = events[travelInput.value].icon;
-        document.querySelector(`.point__destination-label`).innerText = events[travelInput.value].activity;
-        document.querySelector(`.travel-way__toggle`).checked = false;
-        let newOffers = [];
-        offers.forEach(function (offer) {
-
-          if (travelInput.value === offer.type) {
-
-            newOffers = offer.offers;
-            newOffers.forEach(function (newOffer) {
-              if (newOffer !== null && !newOffer.title) {
-                renameObjectField(`name`, `title`, newOffer);
-              }
-            });
-          }
-        });
-        offersWrapElement.innerHTML = ``;
-        offersWrapElement.innerHTML = renderOffers(newOffers);
-        this.updateOffers(newOffers);
-      };
+      travelInput.addEventListener(`click`, onTravelInputClick);
     });
 
     const destinationInputElement = this._element.querySelector(`.point__destination-input`);
