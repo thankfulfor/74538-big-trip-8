@@ -101,10 +101,25 @@ export class NewPoint extends Component {
         return radio.checked;
       }
 
+      if (![...travelInputsElements].some(isChecked)) {
+        document.querySelector(`.travel-way__label`).classList.add(`input-round--invalid`);
+      } else {
+        document.querySelector(`.travel-way__label`).classList.remove(`input-round--invalid`);
+      }
+
+      const markInvalidInput = (input, label) => {
+        if (!document.querySelector(input).checkValidity()) {
+          document.querySelector(label).classList.add(`input--invalid`);
+        } else {
+          document.querySelector(label).classList.remove(`input--invalid`);
+        }
+      };
+
+      markInvalidInput(`.point__destination-input`, `.point__destination-wrap`);
+      markInvalidInput(`.point__price .point__input`, `.point__price .point__input`);
+
       inputs.push([...travelInputsElements].some(isChecked));
       inputs.push(document.querySelector(`.point__destination-input`).checkValidity());
-      inputs.push(document.querySelector(`input[name='dateStart']`).checkValidity());
-      inputs.push(document.querySelector(`input[name='dateEnd']`).checkValidity());
       inputs.push(document.querySelector(`.point__price .point__input`).checkValidity());
 
       return inputs.every((input) => input);
