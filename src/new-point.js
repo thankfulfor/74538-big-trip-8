@@ -102,16 +102,16 @@ export class NewPoint extends Component {
       }
 
       if (![...travelInputsElements].some(isChecked)) {
-        document.querySelector(`.travel-way__label`).classList.add(`input-round--invalid`);
+        document.querySelector(`.travel-way__label`).classList.toggle(`input-round--invalid`);
       } else {
-        document.querySelector(`.travel-way__label`).classList.remove(`input-round--invalid`);
+        document.querySelector(`.travel-way__label`).classList.toggle(`input-round--invalid`);
       }
 
       const markInvalidInput = (input, label) => {
         if (!document.querySelector(input).checkValidity()) {
-          document.querySelector(label).classList.add(`input--invalid`);
+          document.querySelector(label).classList.toggle(`input--invalid`);
         } else {
-          document.querySelector(label).classList.remove(`input--invalid`);
+          document.querySelector(label).classList.toggle(`input--invalid`);
         }
       };
 
