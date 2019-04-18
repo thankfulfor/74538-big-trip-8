@@ -271,7 +271,6 @@ export class EditPoint extends Component {
           });
         }
       });
-      offersWrapElement.innerHTML = ``;
       offersWrapElement.innerHTML = renderOffers(newOffers);
       this.updateOffers(newOffers);
     };
