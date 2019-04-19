@@ -97,22 +97,15 @@ export class PointForm extends Component {
         return radio.checked;
       }
 
-      if ([...travelInputsElements].some(isChecked)) {
-        document.querySelector(`.travel-way__label`).classList.toggle(`input-round--invalid`);
-      } else {
-        document.querySelector(`.travel-way__label`).classList.toggle(`input-round--invalid`);
-      }
-
-      const markInvalidInput = (input, label) => {
-        if (document.querySelector(input).checkValidity()) {
-          document.querySelector(label).classList.toggle(`input--invalid`);
-        } else {
-          document.querySelector(label).classList.toggle(`input--invalid`);
-        }
-      };
-
-      markInvalidInput(`.point__destination-input`, `.point__destination-wrap`);
-      markInvalidInput(`.point__price .point__input`, `.point__price .point__input`);
+      document.querySelector(`.travel-way__label`).classList.toggle(
+          `input-round--invalid`, ![...travelInputsElements].some(isChecked)
+      );
+      document.querySelector(`.point__destination-wrap`).classList.toggle(
+          `input--invalid`, !document.querySelector(`.point__destination-input`).checkValidity()
+      );
+      document.querySelector(`.point__price .point__input`).classList.toggle(
+          `input--invalid`, !document.querySelector(`.point__price .point__input`).checkValidity()
+      );
 
       inputs.push([...travelInputsElements].some(isChecked));
       inputs.push(document.querySelector(`.point__destination-input`).checkValidity());
