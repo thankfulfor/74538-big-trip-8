@@ -127,7 +127,7 @@ export class EditPoint extends PointForm {
             <label class="point__price">
               write price
               <span class="point__price-currency">€</span>
-              <input class="point__input" type="text" value="${this._price}" name="price" required>
+              <input class="point__input" type="number" value="${this._price}" name="price" required>
             </label>
       
             <div class="point__buttons">

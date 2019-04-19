@@ -118,7 +118,7 @@ export class NewPoint extends PointForm {
             <label class="point__price">
               write price
               <span class="point__price-currency">€</span>
-              <input class="point__input" type="text" value="${this._price}" name="price" placeholder="999" required>
+              <input class="point__input" type="number" value="${this._price}" name="price" placeholder="999" required>
             </label>
       
             <div class="point__buttons">
