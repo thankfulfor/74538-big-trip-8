@@ -1,11 +1,10 @@
-import {Component} from './component';
 import moment from 'moment';
-import {renderEvents, events} from './render-events';
+import {events} from './render-events';
 import {destinations} from './main';
 import {Adapter} from './adapter';
-import {triggerFlatpickr, renderTimeInputs} from './get-date-picker';
+import {PointForm} from './point-form';
 
-export class NewPoint extends Component {
+export class NewPoint extends PointForm {
   constructor() {
     super();
     this._id = ``;
@@ -18,23 +17,6 @@ export class NewPoint extends Component {
     this._time = {};
     this._price = ``;
     this._isFavorite = false;
-    this._renderEvents = renderEvents;
-    this._onSubmit = null;
-    this._onEscape = null;
-    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
-    this._onEscapePress = this._onEscapePress.bind(this);
-  }
-
-  get saveButton() {
-    return this._element.querySelector(`.point__button--save`);
-  }
-
-  renderOptions(destinationsListItem) {
-    const names = destinationsListItem.map((item) => item.name);
-    const options = names.map((name) => {
-      return `<option value="${name}"></option>`;
-    });
-    return options.join(``);
   }
 
   update(data) {
@@ -45,11 +27,6 @@ export class NewPoint extends Component {
     this._time = data.time;
     this._title = data.title;
     this._isFavorite = data.isFavorite;
-  }
-
-  updateDesription(pictures, description) {
-    this._pictures = pictures;
-    this._description = description;
   }
 
   static createMapper(target) {
@@ -90,54 +67,6 @@ export class NewPoint extends Component {
     return entry;
   }
 
-  _onSubmitButtonClick(evt) {
-    evt.preventDefault();
-
-    let inputs = [];
-
-    const checkFormValidity = () => {
-      const travelInputsElements = document.querySelectorAll(`.travel-way__select-input`);
-      function isChecked(radio) {
-        return radio.checked;
-      }
-
-      if ([...travelInputsElements].some(isChecked)) {
-        document.querySelector(`.travel-way__label`).classList.toggle(`input-round--invalid`);
-      } else {
-        document.querySelector(`.travel-way__label`).classList.toggle(`input-round--invalid`);
-      }
-
-      const markInvalidInput = (input, label) => {
-        if (document.querySelector(input).checkValidity()) {
-          document.querySelector(label).classList.toggle(`input--invalid`);
-        } else {
-          document.querySelector(label).classList.toggle(`input--invalid`);
-        }
-      };
-
-      markInvalidInput(`.point__destination-input`, `.point__destination-wrap`);
-      markInvalidInput(`.point__price .point__input`, `.point__price .point__input`);
-
-      inputs.push([...travelInputsElements].some(isChecked));
-      inputs.push(document.querySelector(`.point__destination-input`).checkValidity());
-      inputs.push(document.querySelector(`.point__price .point__input`).checkValidity());
-
-      return inputs.every((input) => input);
-    };
-
-    if (checkFormValidity()) {
-      evt.target.innerText = `Saving...`;
-      const formData = new FormData(this._element.querySelector(`.point__form`));
-      const newData = this._processForm(formData);
-      if (typeof this._onSubmit === `function`) {
-        this._onSubmit(newData);
-      }
-      this.update(newData);
-    } else {
-      this.shake();
-    }
-  }
-
   set onEscape(fn) {
     this._onEscape = fn;
   }
@@ -164,7 +93,7 @@ export class NewPoint extends Component {
       
             <div class="travel-way">
               <label class="travel-way__label" for="travel-way__toggle">${this._icon}️</label>
-              <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle" required>
+              <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
               ${this._renderEvents(this._icon)}
             </div>
       
@@ -184,7 +113,7 @@ export class NewPoint extends Component {
               </datalist>
             </div>
       
-            ${renderTimeInputs(new Date(), new Date())}
+            ${this.renderTimeInputs(new Date(), new Date())}
       
             <label class="point__price">
               write price
@@ -221,10 +150,6 @@ export class NewPoint extends Component {
     );
   }
 
-  set onSubmit(fn) {
-    this._onSubmit = fn;
-  }
-
   shake() {
     const ANIMATION_TIMEOUT = 600;
     this._element.classList.add(`error-animation`);
@@ -238,7 +163,26 @@ export class NewPoint extends Component {
   bind() {
     this.saveButton.addEventListener(`click`, this._onSubmitButtonClick);
 
-    triggerFlatpickr(this._element, new Date(), new Date());
+    this.triggerFlatpickr(this._element, new Date(), new Date());
+    //
+    // flatpickr(this._element.querySelector(`input[name='dateStart']`),
+    //   {
+    //     'defaultDate': new Date(),
+    //     'enableTime': true,
+    //     'time_24hr': true,
+    //     'altInput': true,
+    //     'altFormat': `H:i`,
+    //     'dateFormat': `Z`,
+    //   });
+    // flatpickr(this._element.querySelector(`input[name='dateEnd']`),
+    //   {
+    //     'defaultDate': new Date(),
+    //     'enableTime': true,
+    //     'time_24hr': true,
+    //     'altInput': true,
+    //     'altFormat': `H:i`,
+    //     'dateFormat': `Z`,
+    //   });
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
 

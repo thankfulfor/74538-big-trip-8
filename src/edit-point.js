@@ -1,11 +1,10 @@
-import {Component} from './component';
 import moment from 'moment';
-import {renderEvents, events} from './render-events';
+import {events} from './render-events';
 import {renderOffers} from './render-offers';
 import {destinations, offers} from './main';
-import {triggerFlatpickr, renderTimeInputs} from './get-date-picker';
+import {PointForm} from './point-form';
 
-export class EditPoint extends Component {
+export class EditPoint extends PointForm {
   constructor(data) {
     super();
     this._id = data.id;
@@ -19,29 +18,12 @@ export class EditPoint extends Component {
     this._price = data.price;
     this._offers = data.offers;
     this._isFavorite = data.isFavorite;
-    this._renderEvents = renderEvents;
     this._renderOffers = renderOffers;
-    this._onSubmit = null;
-    this._onEscape = null;
-    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
-    this._onEscapePress = this._onEscapePress.bind(this);
-  }
-
-  get saveButton() {
-    return this._element.querySelector(`.point__button--save`);
   }
 
   get deleteButton() {
     return this._element.querySelector(`.point__button--delete`);
-  }
-
-  renderOptions(destinationsListItem) {
-    const names = destinationsListItem.map((item) => item.name);
-    const optionsList = names.map((name) => {
-      return `<option value="${name}"></option>`;
-    });
-    return optionsList.join(``);
   }
 
   update(data) {
@@ -52,11 +34,6 @@ export class EditPoint extends Component {
     this._price = data.price;
     this._time = data.time;
     this._isFavorite = data.isFavorite;
-  }
-
-  updateDesription(pictures, description) {
-    this._pictures = pictures;
-    this._description = description;
   }
 
   updateOffers(newOffers) {
@@ -112,27 +89,6 @@ export class EditPoint extends Component {
     return entry;
   }
 
-  _onSubmitButtonClick(evt) {
-    evt.preventDefault();
-    evt.target.innerText = `Saving...`;
-    const formData = new FormData(this._element.querySelector(`.point__form`));
-    const newData = this._processForm(formData, this._offers);
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit(newData);
-    }
-    this.update(newData);
-  }
-
-  set onEscape(fn) {
-    this._onEscape = fn;
-  }
-
-  _onEscapePress(evt) {
-    if (evt.keyCode === 27 && typeof this._onEscape === `function`) {
-      this._onEscape();
-    }
-  }
-
   get template() {
     return (
       `<article class="point">
@@ -159,18 +115,19 @@ export class EditPoint extends Component {
                   id="destination"
                   value="${this._city}"
                   name="destination"
+                  required
               />
               <datalist id="destination-select">
                 ${this.renderOptions(destinations)}
               </datalist>
             </div>
             
-            ${renderTimeInputs(this._time.startTime, this._time.endTime)}
+            ${this.renderTimeInputs(this._time.startTime, this._time.endTime)}
       
             <label class="point__price">
               write price
               <span class="point__price-currency">€</span>
-              <input class="point__input" type="text" value="${this._price}" name="price">
+              <input class="point__input" type="text" value="${this._price}" name="price" required>
             </label>
       
             <div class="point__buttons">
@@ -222,7 +179,7 @@ export class EditPoint extends Component {
   _onDeleteButtonClick() {
     if (typeof this._onDelete === `function`) {
       this._onDelete({id: this._id});
-      this._deleteButton.innerText = `Deleting...`;
+      this.deleteButton.innerText = `Deleting...`;
     }
   }
 
@@ -242,7 +199,26 @@ export class EditPoint extends Component {
     this.saveButton.addEventListener(`click`, this._onSubmitButtonClick);
     this.deleteButton.addEventListener(`click`, this._onDeleteButtonClick);
 
-    triggerFlatpickr(this._element, this._time.startTime, this._time.endTime);
+    this.triggerFlatpickr(this._element, this._time.startTime, this._time.endTime);
+    //
+    // flatpickr(this._element.querySelector(`input[name='dateStart']`),
+    //   {
+    //     'defaultDate': new Date(),
+    //     'enableTime': true,
+    //     'time_24hr': true,
+    //     'altInput': true,
+    //     'altFormat': `H:i`,
+    //     'dateFormat': `Z`,
+    //   });
+    // flatpickr(this._element.querySelector(`input[name='dateEnd']`),
+    //   {
+    //     'defaultDate': new Date(),
+    //     'enableTime': true,
+    //     'time_24hr': true,
+    //     'altInput': true,
+    //     'altFormat': `H:i`,
+    //     'dateFormat': `Z`,
+    //   });
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
     const offersWrapElement = this._element.querySelector(`.point__offers-wrap`);

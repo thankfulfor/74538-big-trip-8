@@ -18,14 +18,11 @@ export const triggerFlatpickr = (parentElement, dateStart, dateEnd) => {
   const startInputTimeElement = parentElement.querySelector(`input[name='dateStart']`);
   const endInputTimeElement = parentElement.querySelector(`input[name='dateEnd']`);
 
-  // console.log('startInputTimeElement', startInputTimeElement.value);
-  // console.log('endInputTimeElement', endInputTimeElement.value);
-
-  const closeStart = (selectedDates, dateStr) => {
+  const closeStart = (selectedDates, dateStr, instance) => {
     endPicker.set(`minDate`, dateStr);
   };
 
-  const closeEnd = (selectedDates, dateStr) => {
+  const closeEnd = (selectedDates, dateStr, instance) => {
     startPicker.set(`maxDate`, dateStr);
   };
 
@@ -42,6 +39,7 @@ export const renderTimeInputs = (dateStart, dateEnd) => {
           value="${dateStart}"
           name="dateStart"
           placeholder="${dateStart}"
+          required
         />
         <span class="point__input point__input--separator">–</span>
         <input
@@ -50,6 +48,7 @@ export const renderTimeInputs = (dateStart, dateEnd) => {
           value="${dateEnd}"
           name="dateEnd"
           placeholder="${dateEnd}"
+          required
         />
     </div>`
   );
