@@ -3,7 +3,7 @@ import {renderEvents} from './render-events';
 import flatpickr from 'flatpickr';
 
 export class PointForm extends Component {
-  constructor(data) {
+  constructor() {
     super();
     this._renderEvents = renderEvents;
     this._onSubmit = null;
