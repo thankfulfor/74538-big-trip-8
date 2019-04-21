@@ -1,6 +1,7 @@
 import {Component} from './component';
 import {renderEvents} from './render-events';
 import flatpickr from 'flatpickr';
+import {destinations} from './main';
 
 export class PointForm extends Component {
   constructor() {
@@ -141,4 +142,27 @@ export class PointForm extends Component {
   }
 
   shake() {}
+
+  commonHandlers() {
+    this.saveButton.addEventListener(`click`, this._onSubmitButtonClick);const destinationInputElement = this._element.querySelector(`.point__destination-input`);
+    const destinationTextElement = this._element.querySelector(`.point__destination-text`);
+    const destinationImageElements = this._element.querySelector(`.point__destination-images`);
+
+    const onDestinationInputElementClick = () => {
+      let description = ``;
+      let photos = [];
+      destinations.some(function (destination) {
+        if (destinationInputElement.value === destination.name) {
+          destinationTextElement.innerText = destination.description;
+          description = destination.description;
+          photos = destination.pictures;
+          destinationImageElements.innerHTML = destination.pictures.map((picture) => (`<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`)).join(``);
+        }
+      });
+      this.updateDesription(photos, description);
+    };
+
+    destinationInputElement.addEventListener(`change`, onDestinationInputElementClick);
+    document.addEventListener(`keydown`, this._onEscapePress);
+  }
 }

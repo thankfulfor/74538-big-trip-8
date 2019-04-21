@@ -161,28 +161,9 @@ export class NewPoint extends PointForm {
   }
 
   bind() {
-    this.saveButton.addEventListener(`click`, this._onSubmitButtonClick);
+    this.commonHandlers();
 
     this.triggerFlatpickr(this._element, new Date(), new Date());
-    //
-    // flatpickr(this._element.querySelector(`input[name='dateStart']`),
-    //   {
-    //     'defaultDate': new Date(),
-    //     'enableTime': true,
-    //     'time_24hr': true,
-    //     'altInput': true,
-    //     'altFormat': `H:i`,
-    //     'dateFormat': `Z`,
-    //   });
-    // flatpickr(this._element.querySelector(`input[name='dateEnd']`),
-    //   {
-    //     'defaultDate': new Date(),
-    //     'enableTime': true,
-    //     'time_24hr': true,
-    //     'altInput': true,
-    //     'altFormat': `H:i`,
-    //     'dateFormat': `Z`,
-    //   });
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
 
@@ -194,28 +175,6 @@ export class NewPoint extends PointForm {
         document.querySelector(`.travel-way__toggle`).checked = false;
       };
     });
-
-    const destinationInputElement = this._element.querySelector(`.point__destination-input`);
-    const destinationTextElement = this._element.querySelector(`.point__destination-text`);
-    const destinationImageElements = this._element.querySelector(`.point__destination-images`);
-
-    const onDestinationInputElementClick = () => {
-      let description = ``;
-      let photos = [];
-      destinations.some(function (destination) {
-        if (destinationInputElement.value === destination.name) {
-          destinationTextElement.innerText = destination.description;
-          description = destination.description;
-          photos = destination.pictures;
-          destinationImageElements.innerHTML = destination.pictures.map((picture) => (`<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`)).join(``);
-        }
-      });
-      this.updateDesription(photos, description);
-    };
-
-    destinationInputElement.addEventListener(`change`, onDestinationInputElementClick);
-
-    document.addEventListener(`keydown`, this._onEscapePress);
   }
 
   unbind() {
