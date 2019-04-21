@@ -9,7 +9,7 @@ import {Api} from './api';
 import {events} from './render-events';
 import moment from 'moment';
 
-const AUTHORIZATION = `Basic dkjh564tfhfYNz9yZAorrdfmbfgrr=30`;
+const AUTHORIZATION = `Basic dkj47634758fhfYNz9yZAorrdfmbfgrr=30`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const filters = [
@@ -62,6 +62,13 @@ const escapeHandler = (openComponent, closeComponent) => {
   closeComponent.unrender();
 };
 
+const updateCostElement = () => {
+  costComponent.totalPrice(allEvents);
+  costComponent.unrender();
+  totalPriceParentElement.innerHTML = ``;
+  totalPriceParentElement.appendChild(costComponent.render());
+};
+
 const renderPoint = function (data) {
   const pointComponent = new Point(data);
   const editPointComponent = new EditPoint(data);
@@ -96,10 +103,8 @@ const renderPoint = function (data) {
     data.offers = newObject.offers;
     data.title = newObject.title;
     data.isFavorite = newObject.isFavorite;
-    costComponent.totalPrice(allEvents);
-    costComponent.unrender();
-    totalPriceParentElement.innerHTML = ``;
-    totalPriceParentElement.appendChild(costComponent.render());
+
+    updateCostElement();
 
     toggleReadonly(editPointComponent, true);
 
@@ -156,10 +161,6 @@ const addNewEvent = () => {
     };
 
     newPointComponent.onSubmit = (newData) => {
-      costComponent.totalPrice(allEvents);
-      costComponent.unrender();
-      totalPriceParentElement.innerHTML = ``;
-      totalPriceParentElement.appendChild(costComponent.render());
       toggleReadonly(newPointComponent, true);
 
       api.addPoint(newData.toRAW())
@@ -171,6 +172,7 @@ const addNewEvent = () => {
           allEvents = newPoints;
           pointParentElement.innerHTML = ``;
           showPoints(newPoints);
+          updateCostElement();
         })
         .catch(() => {
           newPointComponent.shake();
@@ -186,10 +188,10 @@ const filterEvents = (points, filterName) => {
       return points;
 
     case `filter-future`:
-      return points.filter((it) => it.time.startTime < Date.now());
+      return points.filter((it) => moment(it.time.startTime).valueOf() <= Date.now());
 
     case `filter-past`:
-      return points.filter((it) => it.time.startTime > Date.now());
+      return points.filter((it) => moment(it.time.startTime).valueOf() > Date.now());
   }
 };
 
@@ -202,7 +204,6 @@ filtersParentElement.addEventListener(`change`, (evt) => {
 });
 
 showStatsButton.addEventListener(`click`, function () {
-
   showStatsButton.classList.add(`view-switch__item--active`);
   showPointsButton.classList.remove(`view-switch__item--active`);
   table.classList.add(`visually-hidden`);
