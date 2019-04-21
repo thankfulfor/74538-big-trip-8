@@ -19,7 +19,7 @@ export class PointForm extends Component {
     return this._element.querySelector(`.point__button--save`);
   }
 
-  getFlatpickrSettings(date, picker) {
+  getFlatpickrSettings(date) {
     return {
       'defaultDate': date,
       'enableTime': true,
@@ -27,7 +27,6 @@ export class PointForm extends Component {
       'altInput': true,
       'altFormat': `H:i`,
       'dateFormat': `Z`,
-      'onClose': picker,
     };
   }
 
@@ -36,15 +35,8 @@ export class PointForm extends Component {
     const startInputTimeElement = parentElement.querySelector(`input[name='dateStart']`);
     const endInputTimeElement = parentElement.querySelector(`input[name='dateEnd']`);
 
-    const closeStart = (selectedDates, dateStr) => {
-      endPicker.set(`minDate`, dateStr);
-    };
-
-    const closeEnd = (selectedDates, dateStr) => {
-      startPicker.set(`maxDate`, dateStr);
-    };
-    const startPicker = flatpickr(startInputTimeElement, this.getFlatpickrSettings(dateStart, closeStart));
-    const endPicker = flatpickr(endInputTimeElement, this.getFlatpickrSettings(dateEnd, closeEnd));
+    flatpickr(startInputTimeElement, this.getFlatpickrSettings(dateStart));
+    flatpickr(endInputTimeElement, this.getFlatpickrSettings(dateEnd));
   }
 
   renderTimeInputs(dateStart, dateEnd) {
