@@ -168,6 +168,7 @@ const addNewEvent = () => {
         })
         .then(() => api.getPoints())
         .then((newPoints) => {
+          allEvents = newPoints;
           pointParentElement.innerHTML = ``;
           showPoints(newPoints);
         })
@@ -201,6 +202,7 @@ filtersParentElement.addEventListener(`change`, (evt) => {
 });
 
 showStatsButton.addEventListener(`click`, function () {
+
   showStatsButton.classList.add(`view-switch__item--active`);
   showPointsButton.classList.remove(`view-switch__item--active`);
   table.classList.add(`visually-hidden`);
