@@ -15,5 +15,12 @@ export const renderOffers = (offers) => {
       `;
   });
 
-  return offersList.join(``);
+  return (
+    `<section class="point__offers">
+        <h3 class="point__details-title">offers</h3>
+        <div class="point__offers-wrap">
+          ${offersList.join(``)}
+        </div>
+     </section>`
+  );
 };

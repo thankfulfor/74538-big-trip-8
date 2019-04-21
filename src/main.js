@@ -9,7 +9,7 @@ import {Api} from './api';
 import {events} from './render-events';
 import moment from 'moment';
 
-const AUTHORIZATION = `Basic dkjhkjgkhkfjghjkhfYNz9yZAorrdfmbfgrr=30`;
+const AUTHORIZATION = `Basic dkjh564tfhfYNz9yZAorrdfmbfgrr=30`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const filters = [

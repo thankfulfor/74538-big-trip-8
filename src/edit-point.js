@@ -1,7 +1,6 @@
-import moment from 'moment';
 import {events} from './render-events';
 import {renderOffers} from './render-offers';
-import {destinations, offers} from './main';
+import {offers} from './main';
 import {PointForm} from './point-form';
 
 export class EditPoint extends PointForm {
@@ -38,17 +37,6 @@ export class EditPoint extends PointForm {
 
   updateOffers(newOffers) {
     this._offers = newOffers;
-  }
-
-  static createMapper(target) {
-    return {
-      dateEnd: (value) => (target.time.endTime = value),
-      dateStart: (value) => (target.time.startTime = value),
-      destination: (value) => (target.city = value),
-      price: (value) => (target.price = value),
-      travelWay: (value) => (target.activity = value),
-      favorite: (value) => (target.isFavorite = Boolean(value)),
-    };
   }
 
   _processForm(formData, offersData) {
@@ -89,83 +77,12 @@ export class EditPoint extends PointForm {
     return entry;
   }
 
-  get template() {
-    return (
-      `<article class="point">
-        <form action="" class="point__form" method="get">
-      
-          <header class="point__header">
-      
-            <label class="point__date">
-              choose day
-              <input class="point__input" type="text" placeholder="${moment(this._date).format(`LL`)}" name="day">
-            </label>
-      
-            <div class="travel-way">
-              <label class="travel-way__label" for="travel-way__toggle">${this._icon}️</label>
-              <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
-              ${this._renderEvents(this._icon)}
-            </div>
-      
-            <div class="point__destination-wrap">
-              <label class="point__destination-label" for="destination">${this._activity}</label>
-              <input
-                  class="point__destination-input"
-                  list="destination-select"
-                  id="destination"
-                  value="${this._city}"
-                  name="destination"
-                  required
-              />
-              <datalist id="destination-select">
-                ${this.renderOptions(destinations)}
-              </datalist>
-            </div>
-            
-            ${this.renderTimeInputs(this._time.startTime, this._time.endTime)}
-      
-            <label class="point__price">
-              write price
-              <span class="point__price-currency">€</span>
-              <input class="point__input" type="number" value="${this._price}" name="price" required>
-            </label>
-      
-            <div class="point__buttons">
-              <button class="point__button point__button--save" type="submit">Save</button>
-              <button class="point__button point__button--delete" type="reset">Delete</button>
-            </div>
-      
-            <div class="paint__favorite-wrap">
-              <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite" ${this._isFavorite ? `checked` : ``}>
-                <label class="point__favorite" for="favorite">favorite</label>
-              </div>
-            </header>
-        
-            <section class="point__details">
-              
-              <section class="point__offers">
-                <h3 class="point__details-title">offers</h3>
-                <div class="point__offers-wrap">
-                  ${this._renderOffers(this._offers)}
-              </div>
-            </section>
-            
-            <section class="point__destination">
-              <h3 class="point__details-title">Destination</h3>
-              <p class="point__destination-text">
-                ${this._description}
-              </p>
-              <div class="point__destination-images">
-              ${this._pictures.map((picture) => (`<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`))}
-              </div>
-            </section>
-            
-            <input type="hidden" class="point__total-price" name="total-price" value="">
-            
-          </section>
-        </form>
-      </article>`
-    );
+  renderTime() {
+    return this.renderTimeInputs(this._time.startTime, this._time.endTime);
+  }
+
+  renderDeleteButton() {
+    return `<button class="point__button point__button--delete" type="reset">Delete</button>`;
   }
 
   set onSubmit(fn) {
@@ -203,7 +120,7 @@ export class EditPoint extends PointForm {
     this.triggerFlatpickr(this._element, this._time.startTime, this._time.endTime);
 
     const travelInputsCollection = this._element.querySelectorAll(`.travel-way__select-input`);
-    const offersWrapElement = this._element.querySelector(`.point__offers-wrap`);
+    const offersWrapElement = this._element.querySelector(`.point__offers`);
 
     const renameObjectField = (oldKey, newKey, object) => {
       if (oldKey !== newKey) {
